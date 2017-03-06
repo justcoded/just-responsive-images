@@ -63,6 +63,7 @@ class AttachmentImage {
 			$rwd_image_sizes[ $key ] = new RwdSet( $key, $params );
 		}
 
+		add_theme_support( 'post-thumbnails' );
 		$this->add_image_responsive_hooks();
 	}
 
