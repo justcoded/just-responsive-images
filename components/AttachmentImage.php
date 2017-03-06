@@ -23,6 +23,8 @@ class AttachmentImage extends \jri\core\Component {
 	public function __construct() {
 		add_action( 'after_setup_theme', array( $this, 'after_theme_setup' ) );
 
+		// load rwd template functions
+		include ( JRI_ROOT . '/inc/template-functions.php' );
 		//add_filter( 'editor_max_image_size', array( $this, 'add_max_image_sizes' ), 10, 3 );
 	}
 

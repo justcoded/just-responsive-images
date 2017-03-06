@@ -26,28 +26,28 @@ class RwdOption {
 	 *
 	 * @var string|null
 	 */
-	public $picture;
+	public $picture = null;
 
 	/**
 	 * Background media wrappers
 	 *
 	 * @var string|null
 	 */
-	public $bg;
+	public $bg = null;
 
 	/**
 	 * Img tag `srcset` attribute part
 	 *
 	 * @var string|null
 	 */
-	public $srcset;
+	public $srcset = null;
 
 	/**
 	 * Img tag `sizes` attribute part
 	 *
 	 * @var string|null
 	 */
-	public $sizes;
+	public $sizes = null;
 
 	/**
 	 * RwdOption constructor.
