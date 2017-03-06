@@ -1,0 +1,29 @@
+
+# editor
+/nbproject/private/
+/nbproject/
+.project
+.idea
+
+# composer
+composer.lock
+/vendor/
+
+# svn
+.svn
+
+# Ignore Mac DS_Store files
+.DS_Store
+._*
+node_modules/
+
+# linux backup files
+*~
+
+# markup
+.sass-cache
+node_modules
+*.map
+.tmp
+tmp/
+*.psd

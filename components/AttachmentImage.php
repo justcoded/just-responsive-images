@@ -7,7 +7,7 @@ use jri\objects\RwdSet;
 /**
  * Patch standard <img> "srcset" attribute generation
  */
-class AttachmentImage extends \jri\core\Component {
+class AttachmentImage {
 
 	/**
 	 * Internal cache for advanced post thumbnails srcset feature
@@ -25,6 +25,7 @@ class AttachmentImage extends \jri\core\Component {
 
 		// load rwd template functions
 		include ( JRI_ROOT . '/inc/template-functions.php' );
+		add_action('wp_footer', 'rwd_print_styles');
 		//add_filter( 'editor_max_image_size', array( $this, 'add_max_image_sizes' ), 10, 3 );
 	}
 

@@ -12,7 +12,7 @@ return array(
 		'laptop' => array(
 			array( 1280, 9999 ),
 			'picture' => '<source srcset="{src}" media="(min-width: 981px)">',
-			'bg' => '@media screen and (max-width:1281px)',
+			'bg' => '@media screen and (max-width:1280px)',
 			'srcset' => '1280w',
 			'sizes' => '(min-width: 981px) 1280px',
 		),
