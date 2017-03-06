@@ -1,6 +1,6 @@
 <?php
 /**
- * Template functions to simplify using <picture> tags and dynamic mobile-firendly backgrounds.
+ * Template functions to simplify using <picture> tags and dynamic mobile-friendly backgrounds.
  */
 
 use jri\objects\RwdImage;
@@ -10,7 +10,14 @@ use jri\objects\RwdImage;
  * which should be set through 'rwd_image_sizes' filter hook.
  *
  * @param WP_Post|int|null $attachment WordPress attachment object, ID or null. If null passed will take featured image of current post.
- * @param string|array     $size Image size name or array with custom attachment IDs for specific rwd sizes.
+ * @param string|array     $size {
+ *              Single image size name OR array
+ *
+ *              @type int 0 =>  $size (first element should be the name of image size),
+ *              @type string            $subsize => $attachment_id  ($attachment to be used to rewrite image in another resolution)
+ *        }
+ * Image size name or array with custom attachment IDs for specific rwd sizes.
+ *
  * @param string           $tag Specify which tag should be used: picture|img.
  */
 function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture' ) {
@@ -22,7 +29,12 @@ function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = '
  * which should be set through 'rwd_image_sizes' filter hook.
  *
  * @param WP_Post|int|null $attachment WordPress attachment object, ID or null. If null passed will take featured image of current post.
- * @param string|array     $size Image size name or array with custom attachment IDs for specific rwd sizes.
+ * @param string|array     $size {
+ *              Single image size name OR array
+ *
+ *              @type int 0 =>  $size (first element should be the name of image size),
+ *              @type string            $subsize => $attachment_id  ($attachment to be used to rewrite image in another resolution)
+ *        }
  * @param string           $tag Specify which tag should be used: picture|img.
  *
  * @return string Generated html.
@@ -31,7 +43,7 @@ function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag
 	$rwd_image = new RwdImage( $attachment );
 
 	$size = apply_filters( 'post_thumbnail_size', $size );
-	if ( 'img' != $tag  ) {
+	if ( 'img' != $tag ) {
 		$html = $rwd_image->picture( $size );
 	} else {
 		$html = $rwd_image->img( $size );
@@ -48,11 +60,16 @@ function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag
  *
  * @param string           $selector Dynamic css selector
  * @param WP_Post|int|null $attachment WordPress attachment object, ID or null. If null passed will take featured image of current post.
- * @param string|array     $size Image size name or array with custom attachment IDs for specific rwd sizes.
+ * @param string|array     $size {
+ *              Single image size name OR array
+ *
+ *              @type int 0 =>  $size (first element should be the name of image size),
+ *              @type string            $subsize => $attachment_id  ($attachment to be used to rewrite image in another resolution)
+ *        }
  */
 function rwd_attachment_background( $selector, $attachment = null, $size = 'thumbnail' ) {
 	$rwd_image = new RwdImage( $attachment );
-	$rwd_image->background( $selector, $size );
+	echo $rwd_image->background( $selector, $size );
 }
 
 /**

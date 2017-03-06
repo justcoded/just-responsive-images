@@ -23,12 +23,14 @@ class AttachmentImage {
 	public function __construct() {
 		add_action( 'after_setup_theme', array( $this, 'after_theme_setup' ) );
 
-		// load rwd template functions
-		include ( JRI_ROOT . '/inc/template-functions.php' );
-		add_action('wp_footer', 'rwd_print_styles');
-		//add_filter( 'editor_max_image_size', array( $this, 'add_max_image_sizes' ), 10, 3 );
+		// load rwd template functions.
+		include( JRI_ROOT . '/inc/template-functions.php' );
+		add_action( 'wp_footer', 'rwd_print_styles' );
 	}
 
+	/**
+	 * Add hooks which patch wordpress <img> srcset and sizes attributes.
+	 */
 	public function add_image_responsive_hooks() {
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_calculated_image_size_cache' ), 10, 4 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'calculate_image_srcset' ), 10, 5 );
@@ -174,11 +176,11 @@ class AttachmentImage {
 	}
 
 	/**
-	 * Clean up <img> "src" attribute at all
+	 * Clean up <img> "src" attribute at all if we generate correct srcset and sizes attributes.
 	 *
-	 * @param array        $attr       Attributes for the image markup.
+	 * @param array        $attr Attributes for the image markup.
 	 * @param WP_Post      $attachment Image attachment post.
-	 * @param string|array $size       Requested size. Image size or array of width and height values
+	 * @param string|array $size Requested size. Image size or array of width and height values
 	 *                                 (in that order). Default 'thumbnail'.
 	 *
 	 * @return mixed

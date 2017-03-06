@@ -46,6 +46,11 @@ class RwdImage {
 	 */
 	protected static $meta_datas;
 
+	/**
+	 * Cache for image base urls
+	 *
+	 * @var array()
+	 */
 	protected static $base_urls;
 
 	/**
@@ -188,6 +193,8 @@ class RwdImage {
 	 *
 	 * @param string       $selector CSS selector.
 	 * @param string|array $size Required image size.
+	 *
+	 * @return string Generated html comments warnings.
 	 */
 	public function background( $selector, $size ) {
 		if ( ! $this->attachment ) {
@@ -215,6 +222,8 @@ class RwdImage {
 				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
 			}
 		}
+
+		return $this->get_warnings_comment();
 	}
 
 	/**
@@ -312,7 +321,7 @@ class RwdImage {
 	 * @return string
 	 */
 	protected function get_warnings_comment() {
-		if ( !empty($this->warnings) ) {
+		if ( ! empty( $this->warnings ) ) {
 			return '<!-- ' . implode( "-->{$this->eol}<!--", $this->warnings ) . '-->' . $this->eol;
 		} else {
 			return '';
