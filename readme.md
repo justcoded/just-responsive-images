@@ -251,7 +251,7 @@ Let's check the example:
 	
 `rwd_attachment_background( $selector, $attachment = null, $size = 'thumbnail' )`	
 
-- string **selector** CSS selector to be used inside <style> code part
+- string **selector** CSS selector to be used inside inline styles code.
 - WP_Post|int|null **$attachment** Atatchment object, Attachment ID or null. In case of null the function will search current post featured image.
 - string|array **$size** Image size name or array of sizes. Same as for `rwd_attachment_image()`.
 
