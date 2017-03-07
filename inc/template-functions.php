@@ -19,9 +19,10 @@ use jri\objects\RwdImage;
  * Image size name or array with custom attachment IDs for specific rwd sizes.
  *
  * @param string           $tag Specify which tag should be used: picture|img.
+ * @param array            $attr  Additional html attributes to be used for main tag.
  */
-function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture' ) {
-	echo get_rwd_attachment_image( $attachment, $size, $tag );
+function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture', $attr = array() ) {
+	echo get_rwd_attachment_image( $attachment, $size, $tag, $attr );
 }
 
 /**
@@ -36,17 +37,18 @@ function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = '
  *              @type string            $subsize => $attachment_id  ($attachment to be used to rewrite image in another resolution)
  *        }
  * @param string           $tag Specify which tag should be used: picture|img.
+ * @param array            $attr  Additional html attributes to be used for main tag.
  *
  * @return string Generated html.
  */
-function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture' ) {
+function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture', $attr = array() ) {
 	$rwd_image = new RwdImage( $attachment );
 
 	$size = apply_filters( 'post_thumbnail_size', $size );
 	if ( 'img' != $tag ) {
-		$html = $rwd_image->picture( $size );
+		$html = $rwd_image->picture( $size, $attr );
 	} else {
-		$html = $rwd_image->img( $size );
+		$html = $rwd_image->img( $size, $attr );
 	}
 
 	return $html;

@@ -44,6 +44,8 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.0.2 =
+	* New: Added parameter to pass additional html attributes into `rwd_attachment_image()`
 = Version 1.0.1 =
 	* Bug fix: Single size option return empty result
 	* Improvement: Smaller images now display lower resolution size even for big screens.

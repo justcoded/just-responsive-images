@@ -25,7 +25,7 @@ return array(
 		),
 		'mobile' => array(
 			array( 414, 9999 ),
-			'picture' => '<img srcset="{src}" alt="{alt}" title="{title}">', // main img.
+			'picture' => '<img srcset="{src}" alt="{alt}">', // main img.
 			'bg' => '@media screen and (max-width:414px)',
 			'srcset' => '414w',
 			'sizes' => '414px',

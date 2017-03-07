@@ -229,11 +229,12 @@ We have 3 new template functions:
 
 ### rwd_attachment_image
 
-`rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture' )`
+`rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = 'picture', $attr = array() )`
 
 - WP_Post|int|null **$attachment** Atatchment object, Attachment ID or null. In case of null the function will search current post featured image.
 - string|array **$size** Image size name or array of sizes. We will check this option in more details below.
 - string **$tag** Available options are 'picture' and 'img'. The html tag, which will be used for image generation.
+- array **$attr** Additional html attributes to be used for main tag (for example "class", "id", etc.).
 
 **$size** option as array:
 

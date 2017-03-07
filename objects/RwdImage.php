@@ -81,10 +81,11 @@ class RwdImage {
 	 * Generate <picture> tag for the current attachment with specified size
 	 *
 	 * @param string|array $size Required image size.
+	 * @param array        $attributes  Additional html attributes to be used for main tag.
 	 *
 	 * @return string
 	 */
-	public function picture( $size ) {
+	public function picture( $size, $attributes = array() ) {
 		if ( ! $this->attachment ) {
 			return '';
 		}
@@ -95,16 +96,25 @@ class RwdImage {
 			$attr = array(
 				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-picture",
 				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
-				'title' => '',
 			);
+			if ( ! empty( $attributes['class'] ) ) {
+				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
+			}
+			$attr = array_merge( $attr, $attributes );
 			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
 			$attr = array_map( 'esc_attr', $attr );
 
 			// default template (if we have only 1 size).
-			$default_template = '<img srcset="{src}" alt="{alt}" title="{title}">';
+			$default_template = '<img srcset="{src}" alt="{alt}">';
 
 			// generation of responsive sizes.
-			$html = "<picture class=\"{$attr['class']}\">" . $this->eol;
+			$html = '<picture';
+			foreach ( $attr as $name => $value ) {
+				if ( 'alt' !== $name ) {
+					$html .= " $name=" . '"' . $value . '"';
+				}
+			}
+			$html .= '>' . $this->eol;
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->picture ) ) {
 					continue;
@@ -116,7 +126,6 @@ class RwdImage {
 				$tokens   = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
 					'{alt}'   => $attr['alt'],
-					'{title}' => $attr['title'],
 					'{w}'     => $meta_data['sizes'][ $subkey ]['width'],
 				);
 
@@ -134,10 +143,11 @@ class RwdImage {
 	 * Generate <img> tag for the current attachment with specified size
 	 *
 	 * @param string|array $size Required image size.
+	 * @param array        $attributes  Additional html attributes to be used for main tag.
 	 *
 	 * @return string
 	 */
-	public function img( $size ) {
+	public function img( $size, $attributes = array() ) {
 		if ( ! $this->attachment ) {
 			return '';
 		}
@@ -149,6 +159,10 @@ class RwdImage {
 				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-image",
 				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
 			);
+			if ( ! empty( $attributes['class'] ) ) {
+				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
+			}
+			$attr = array_merge( $attr, $attributes );
 
 			$srcset = array();
 			$sizes = array();
