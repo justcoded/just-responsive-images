@@ -277,6 +277,19 @@ class RwdImage {
 		foreach ( $this->rwd_set->options as $subkey => $option ) {
 			$attachment = empty( $this->rwd_rewrite[ $subkey ] ) ? $this->attachment : $this->rwd_rewrite[ $subkey ];
 			$meta_data  = $this->get_attachment_metadata( $attachment->ID );
+
+			// for lower images we use max image size for the bigger sizes.
+			if ( ! isset( $meta_data['sizes'][ $subkey ] ) && $meta_data['width'] <= $option->size->w ) {
+				$meta_data['sizes'][ $subkey ] = array(
+					'width' => $meta_data['width'],
+					'height' => $meta_data['height'],
+					'file' => basename( $meta_data['file'] ),
+				);
+				// save to cache.
+				$this->set_attachment_metadata( $attachment->ID, $meta_data );
+			}
+
+			// however if we didn't find correct size - we skip this size with warning.
 			if ( ! isset( $meta_data['sizes'][ $subkey ] ) ) {
 				$this->warnings[] = "Attachment {$attachment->ID}: missing image size \"{$this->rwd_set->key}:{$subkey}\"";
 				continue;
@@ -341,6 +354,16 @@ class RwdImage {
 		}
 
 		return static::$meta_datas[ $attachment_id ];
+	}
+
+	/**
+	 * Set updated values to cache
+	 *
+	 * @param int   $attachment_id Attachment post to update it's metadata cache.
+	 * @param array $meta_data  New meta data values.
+	 */
+	protected function set_attachment_metadata( $attachment_id, $meta_data ) {
+		static::$meta_datas[ $attachment_id ] = $meta_data;
 	}
 
 	/**

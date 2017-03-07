@@ -44,5 +44,8 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.0.1 =
+	* Bug fix: Single size option return empty result
+	* Improvement: Smaller images now display lower resolution size even for big screens.
 = Version 1.0 =
 	* First version of our plugin

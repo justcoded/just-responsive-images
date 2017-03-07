@@ -46,6 +46,13 @@ class RwdSet {
 		// this means we doesn't have any responsive options (for example this is a small thumbnail).
 		if ( 1 === count( $params ) ) {
 			$this->size = new ImageSize( $key, array_shift( $params ) );
+			$this->options[$key] = new RwdOption( $key, array(
+				array( $this->size->w, $this->size->h, $this->size->crop ),
+				'picture' => '<img srcset="{src}" alt="{alt}" title="{title}">',
+				'bg' => '',
+				'srcset' => '{w}w',
+				'sizes' => '',
+			));
 		} else {
 			$this->parse_options( $params );
 		}
