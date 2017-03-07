@@ -27,7 +27,7 @@ All these best practices is not supported in WordPress core by default and you s
 That's why we're here! We want to provide easy-to-use control for customizing srcset for each image size dimension you use inside your theme.
 Also we're happy to provide you with few helpers which will generate <picture> tag, generate required media queries for backgrounds.
 
-Full documentation will be added on our github wiki pages.
+Full documentation and configuration options are available on our github page:
 https://github.com/justcoded/just-responsive-images.
 
 Feel free to post your suggestions or bugs under Issues section on github.
