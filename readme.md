@@ -144,7 +144,7 @@ Let's start from an example:
     		),
     		'tablet' => array(
     			array( 980, 9999 ),
-    			'picture' => '<img srcset="{src}" alt="{alt}" title="{title}">',,
+    			'picture' => '<img srcset="{src}" alt="{alt}">',,
     			'bg' => '@media screen and (max-width:980px)',
     			'srcset' => '980w',
     			'sizes' => '(min-width: 415px) 980px',
@@ -213,7 +213,7 @@ It looks like this:
 			),
 			'mobile' => array(
 				array( 414, 9999 ),
-				'picture' => '<img srcset="{src}" alt="{alt}" title="{title}">', // main img.
+				'picture' => '<img srcset="{src}" alt="{alt}">', // main img.
 				'bg' => '@media screen and (max-width:414px)',
 				'srcset' => '414w',
 				'sizes' => '414px',

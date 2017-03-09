@@ -48,10 +48,10 @@ class RwdSet {
 			$this->size = new ImageSize( $key, array_shift( $params ) );
 			$this->options[$key] = new RwdOption( $key, array(
 				array( $this->size->w, $this->size->h, $this->size->crop ),
-				'picture' => '<img srcset="{src}" alt="{alt}" title="{title}">',
+				'picture' => '<img srcset="{src}" alt="{alt}">',
 				'bg' => '',
 				'srcset' => '{w}w',
-				'sizes' => '',
+				'sizes' => '{w}px',
 			));
 		} else {
 			$this->parse_options( $params );

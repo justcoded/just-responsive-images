@@ -162,13 +162,13 @@ class RwdImage {
 			$attr = array(
 				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-image",
 				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
-				'src'   => '', // it's not used, but included for compatibility with other plugins.
 			);
 			if ( ! empty( $attributes['class'] ) ) {
 				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
 			}
 			$attr = array_merge( $attr, $attributes );
 
+			$src = '';
 			$srcset = array();
 			$sizes = array();
 
@@ -180,23 +180,22 @@ class RwdImage {
 
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
-				$tokens   = array(
+				$tokens    = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
 					'{w}'     => $meta_data['sizes'][ $subkey ]['width'],
 				);
 
+				$src = $tokens['{src}'];
 				$srcset[] = strtr( "{src} $option->srcset", $tokens );
 				$sizes[] = strtr( $option->sizes, $tokens );
 			}
 
+			$attr['src'] = $src;
 			$attr['srcset'] = implode( ', ', $srcset );
 			$attr['sizes'] = implode( ', ', $sizes );
 
 			// the part taken from WP core.
 			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
-			if ( isset( $attr['src'] ) ) { // remove compatibility key, which is not used actually.
-				unset( $attr['src'] );
-			}
 			$attr = array_map( 'esc_attr', $attr );
 			$html = '<img';
 			foreach ( $attr as $name => $value ) {
