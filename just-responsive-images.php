@@ -4,7 +4,7 @@
 Plugin Name: Just Responsive Images
 Description: Provides full control to set responsive image properties for WordPress 4.4+ and support retina images (2x). Allows printing of post attachments images as backgrounds.
 Tags: responsive post thumbnail, responsive post thumbnail background, responsive post attachment, responsive images, responsive attachments, post thumbnails, media, retina support
-Version: 1.0.2
+Version: 1.0.3
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 License: GPL3
