@@ -1,8 +1,8 @@
 === Just Responsive Images ===
 Contributors: aprokopenko
 Plugin Name: Just Responsive Images
-Description: Provides full control to set responsive image properties for WordPress 4.4+ and support retina images (2x). Allows printing of post attachments images as backgrounds.
-Tags: responsive post thumbnail, responsive post thumbnail background, responsive post attachment, responsive images, responsive attachments, post thumbnails, media, retina support
+Description: Providing full control to set your own responsive image properties for WordPress 4.4+, the ability to use the &lt;picture&gt; tag, auto-generate image backgrounds and supports retina images.
+Tags: responsive post thumbnail, responsive post thumbnail background, responsive post attachment, responsive images, responsive attachments, post thumbnails, media, retina support, retina images
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.4
@@ -10,22 +10,27 @@ Tested up to: 4.7.2
 License: GPL3
 Stable tag: trunk
 
-Provides full control to set your own responsive image properties for WordPress 4.4+, ability to use &lt;picture&gt; tag and support retina images.
+Providing full control to set your own responsive image properties for WP 4.4+, the ability to use the &lt;picture&gt; tag and image backgrounds.
 
 == Description ==
 
-Just Responsive Images plugin gives you control of responsive image properties, which WordPress 4.4+ insert to all post thumbnails by default.
+The Just Responsive Images plugin gives you control of responsive image properties,
+which WordPress 4.4+ inserts to all post thumbnails by default.
 
-The default solution is to insert all available image sizes as srcset into img srcset.
-This is not optimal, because browser gets too much image resolutions, it can generate more requests to server (to get the right image) and it takes longer to display image itself.
-Furthermore, Google Page Speed inspector is not satisfied with such method.
+The default solution is to insert all available image sizes as srcset attribute into img tag. This is not optimal,
+because the browser gets too much image resolutions, it can generate more requests to the server (to get the right image)
+and it takes longer to display the image itself. Not to mention, Google Page Speed inspector is not satisfied with
+such a method.
 
-If you have hand-coded mobile-friendly html/css for your theme it usually has media queries for background images, &lt;picture&gt; tags instead of &lt;img&gt; tags.
-Furthermore, images are used as block backgrounds very often.
-All these best practices is not supported in WordPress core by default and you should waste your time to re-write standard functions.
+If you have hand-coded a mobile-friendly HTML/CSS for your theme it usually has media queries for background images
+and &lt;picture&gt; tags instead of &lt;img&gt; tags. A lot of images are used as block backgrounds very often,
+which should be editable from CMS. All these best practices are not supported in the WordPress core by default and
+you end up wasting your time re-writing standard functions.
 
-That's why we're here! We want to provide easy-to-use control for customizing srcset for each image size dimension you use inside your theme.
-Also we're happy to provide you with few helpers which will generate <picture> tag, generate required media queries for backgrounds.
+That's why we're here! We want to provide easy-to-use control for customizing srcset for each image size dimension you
+use inside your theme. Also we're happy to provide you with a few helpers which will generate tags and generate required
+media queries for backgrounds.
+
 
 Full documentation and configuration options are available on our github page:
 https://github.com/justcoded/just-responsive-images.
@@ -37,7 +42,7 @@ Feel free to post your suggestions or bugs under Issues section on github.
 1. Download, unzip and upload to your WordPress plugins directory
 2. Activate the plugin within you WordPress Administration Backend
 3. Add hook `add_filter('rwd_image_sizes', 'my_rwd_image_sizes');`
-4. Create new function `my_rwd_image_sizes` and return configuration array. The example can be found inside the plugin folder in `/data/config-example.php`
+4. Create new function `my_rwd_image_sizes` and set the configuration array. The example can be found inside the plugin folder in `/data/config-example.php`.
 
 == Upgrade Notice ==
 
