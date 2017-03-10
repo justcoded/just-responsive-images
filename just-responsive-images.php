@@ -4,7 +4,7 @@
 Plugin Name: Just Responsive Images
 Description: Providing full control to set your own responsive image properties for WordPress 4.4+, the ability to use the &lt;picture&gt; tag, auto-generate image backgrounds and supports retina images.
 Tags: responsive post thumbnail, responsive post thumbnail background, responsive post attachment, responsive images, responsive attachments, post thumbnails, media, retina support
-Version: 1.0.5
+Version: 1.0.6
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 License: GPL3
@@ -48,10 +48,10 @@ class JustResponsiveImages extends core\Singleton {
 	protected function __construct() {
 		// init plugin name and version.
 		self::$plugin_name = __( 'Just Responsive Images', JustResponsiveImages::TEXTDOMAIN );
-		self::$version     = 0.100;
+		self::$version     = 1.060;
 
 		// init features, which this plugin is created for.
-		new components\AttachmentImage();
+		new components\PostAttachment();
 	}
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace jri\objects;
+namespace jri\models;
 
 /**
  * Class RwdImage

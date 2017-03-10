@@ -2,12 +2,12 @@
 
 namespace jri\components;
 
-use jri\objects\RwdSet;
+use jri\models\RwdSet;
 
 /**
  * Patch standard <img> "srcset" attribute generation
  */
-class AttachmentImage {
+class PostAttachment {
 
 	/**
 	 * Internal cache for advanced post thumbnails srcset feature
@@ -24,7 +24,7 @@ class AttachmentImage {
 		add_action( 'after_setup_theme', array( $this, 'after_theme_setup' ) );
 
 		// load rwd template functions.
-		include( JRI_ROOT . '/inc/template-functions.php' );
+		include( JRI_ROOT . '/just-rwd-functions.php' );
 		add_action( 'wp_footer', 'rwd_print_styles' );
 	}
 

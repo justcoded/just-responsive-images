@@ -3,7 +3,7 @@
  * Template functions to simplify using <picture> tags and dynamic mobile-friendly backgrounds.
  */
 
-use jri\objects\RwdImage;
+use jri\models\RwdImage;
 
 /**
  * Displays <picture> or <img> for post attachment image specifying correct responsive rules,
