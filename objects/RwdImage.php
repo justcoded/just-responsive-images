@@ -130,7 +130,7 @@ class RwdImage {
 				$tokens   = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
 					'{alt}'   => $attr['alt'],
-					'{w}'     => $meta_data['sizes'][ $subkey ]['width'],
+					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);
 
 				$html .= strtr( $template, $tokens ) . $this->eol;
@@ -182,7 +182,7 @@ class RwdImage {
 
 				$tokens    = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
-					'{w}'     => $meta_data['sizes'][ $subkey ]['width'],
+					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);
 
 				$src = $tokens['{src}'];
@@ -234,7 +234,7 @@ class RwdImage {
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
 				$src = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'];
-				$media = str_replace( '{w}', $meta_data['sizes'][ $subkey ]['width'], $option->bg );
+				$media = str_replace( '{w}', $meta_data['sizes'][ $option->key ]['width'], $option->bg );
 
 				if ( ! isset( $rwd_background_styles[ $media ] ) ) {
 					$rwd_background_styles[ $media ] = array();
@@ -300,8 +300,8 @@ class RwdImage {
 			$meta_data  = $this->get_attachment_metadata( $attachment->ID );
 
 			// for lower images we use max image size for the bigger sizes.
-			if ( ! isset( $meta_data['sizes'][ $subkey ] ) && $meta_data['width'] <= $option->size->w ) {
-				$meta_data['sizes'][ $subkey ] = array(
+			if ( ! isset( $meta_data['sizes'][ $option->key ] ) && $meta_data['width'] <= $option->size->w ) {
+				$meta_data['sizes'][ $option->key ] = array(
 					'width' => $meta_data['width'],
 					'height' => $meta_data['height'],
 					'file' => basename( $meta_data['file'] ),
@@ -311,17 +311,17 @@ class RwdImage {
 			}
 
 			// however if we didn't find correct size - we skip this size with warning.
-			if ( ! isset( $meta_data['sizes'][ $subkey ] ) ) {
+			if ( ! isset( $meta_data['sizes'][ $option->key ] ) ) {
 				$this->warnings[] = "Attachment {$attachment->ID}: missing image size \"{$this->rwd_set->key}:{$subkey}\"";
 				continue;
 			}
 
 			// check that image size width is lower than size width.
-			if ( $attachment_width < $meta_data['sizes'][ $subkey ]['width'] ) {
+			if ( $attachment_width < $meta_data['sizes'][ $option->key ]['width'] ) {
 				continue;
 			}
 
-			$sources[ $subkey ]                  = $meta_data['sizes'][ $subkey ];
+			$sources[ $subkey ]                  = $meta_data['sizes'][ $option->key ];
 			$sources[ $subkey ]['attachment_id'] = $attachment->ID;
 		}
 

@@ -44,6 +44,8 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.0.5 =
+	* Critical fix: Non-inherit settings were ignored during html generation with "Missing image size" warning.
 = Version 1.0.4 =
 	* Bug fix: Added "src" to <img> tag (Google Chrome has a bug with max-width css property without "src" attribute).
 = Version 1.0.3 =
