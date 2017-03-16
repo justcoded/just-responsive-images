@@ -336,11 +336,18 @@ class RwdImage {
 	 * @return \WP_Post|null|
 	 */
 	protected function load_attachment( $attachment ) {
-		if ( is_null( $attachment ) ) {
-			$attachment = get_post_thumbnail_id( get_the_ID() );
+		if ( empty( $attachment ) ) {
+			if ( ! empty( $this->attachment ) ) {
+				$attachment = $this->attachment;
+			} else {
+				$attachment = get_post_thumbnail_id( get_the_ID() );
+			}
 		}
-		if ( is_numeric( $attachment ) ) {
-			$attachment = get_post( $attachment );
+		if ( is_numeric( $attachment ) && $attachment = get_post( $attachment ) ) {
+			// check that ID passed is really an attachment.
+			if ( 'attachment' !== $attachment->post_type ) {
+				$attachment = null;
+			}
 		}
 		if ( is_a( $attachment, '\WP_Post' ) ) {
 			return $attachment;

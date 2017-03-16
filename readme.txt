@@ -49,6 +49,9 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.0.7 - 16 March 2016 =
+	* Bug fix: Post can be passed instead of attachment (now can't fixed)
+	* Bug fix: Wrong image is taken as default if main image is not a featured image and mobile image missing (now default is correct)
 = Version 1.0.6 =
 	* Code refactoring (basically renaming files and class names)
 = Version 1.0.5 =
