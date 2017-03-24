@@ -112,6 +112,7 @@ class UploadsCleanup extends Controller {
 	 * @return string
 	 */
 	protected function get_stats() {
+		// TODO: stats feature.
 		return null;
 	}
 }
