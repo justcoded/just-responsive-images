@@ -49,6 +49,8 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.1 - 24 March 2017 =
+	* New: Ability to clean up all resized images from disk. To use go to Tools > Uploads Cleanup.
 = Version 1.0.8 - 22 March 2017 =
 	* Bug fix: Background main styles were printed after media queries.
 = Version 1.0.7 - 16 March 2017 =
