@@ -35,8 +35,11 @@ class PostAttachment {
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_calculated_image_size_cache' ), 10, 4 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'calculate_image_srcset' ), 10, 5 );
 		add_filter( 'wp_calculate_image_sizes', array( $this, 'calculate_image_sizes' ), 10, 5 );
-		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'attachment_image_attributes' ), 10, 5 );
 		add_filter( 'intermediate_image_sizes', array( $this, 'unify_wp_image_sizes' ) );
+
+		if ( ! empty( $_SERVER['HTTP_USER_AGENT'] ) && ! preg_match('/MSIE (.*?);/', $_SERVER['HTTP_USER_AGENT'], $matches) ) {
+			add_filter( 'wp_get_attachment_image_attributes', array( $this, 'attachment_image_attributes' ), 10, 5 );
+		}
 	}
 
 	/**
