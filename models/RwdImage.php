@@ -78,6 +78,32 @@ class RwdImage {
 	}
 
 	/**
+	 * Check if mime type SVG
+	 *
+	 * @return boolean
+	 */
+	public function is_svg_image() {
+		if ( preg_match( '/.svg/',  get_post_mime_type( $this->attachment->ID ) ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Check if mime type SVG
+	 *
+	 * @param int $attachment_id Attachment ID image.
+	 *
+	 * @return string
+	 */
+	public function get_svg_image( $attachment_id ) {
+		$image = get_attached_file( $attachment_id );
+		$svg = file_get_contents( $image );
+		return $svg;
+	}
+
+	/**
 	 * Generate <picture> tag for the current attachment with specified size
 	 *
 	 * @param string|array $size Required image size.
@@ -88,6 +114,9 @@ class RwdImage {
 	public function picture( $size, $attributes = array() ) {
 		if ( ! $this->attachment ) {
 			return '';
+		}
+		if ( $this->is_svg_image() ) {
+			return $this->get_svg_image( $this->attachment->ID );
 		}
 
 		$html = '';
@@ -156,6 +185,10 @@ class RwdImage {
 			return '';
 		}
 
+		if ( $this->is_svg_image() ) {
+			return $this->get_svg_image( $this->attachment->ID );
+		}
+
 		$html = '';
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			// prepare image attributes (class, alt, title etc).
@@ -218,7 +251,7 @@ class RwdImage {
 	 * @return string Generated html comments warnings.
 	 */
 	public function background( $selector, $size ) {
-		if ( ! $this->attachment ) {
+		if ( ! $this->attachment && $this->is_svg_image() ) {
 			return;
 		}
 
@@ -288,6 +321,10 @@ class RwdImage {
 	public function get_set_sources() {
 		if ( empty( $this->rwd_set ) ) {
 			return null;
+		}
+
+		if ( $this->is_svg_image() ) {
+			return;
 		}
 
 		$sources          = array();
