@@ -49,6 +49,8 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.1.4 - 4 May 2017 =
+	* New: SVG images support (If user used SVG instead of usual image - it will be printed)
 = Version 1.1.3 - 25 April 2017 =
 	* Bug fix: responsive image with "img" tag does not work in IE11
 = Version 1.1.2 - 14 April 2017 =
