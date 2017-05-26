@@ -50,12 +50,19 @@ class RwdOption {
 	public $sizes = null;
 
 	/**
+	 * Retina keys
+	 *
+	 * @var array|null
+	 */
+	public $retina = null;
+
+	/**
 	 * RwdOption constructor.
 	 *
 	 * @param string $key Option key.
 	 * @param array  $params Parameters.
 	 */
-	public function __construct( $key, $params ) {
+	public function __construct( $key, $params, $retina ) {
 		$params = array_merge( array(
 			'picture' => null,
 			'bg'      => null,
@@ -65,11 +72,12 @@ class RwdOption {
 		if ( !isset($params[0]) ) $params[0] = '';
 
 		$this->key     = $key;
-		$this->size    = new ImageSize( $key, $params[0] );
+		$this->size    = new ImageSize( $key, $params[0], $retina );
 		$this->picture = $params['picture'];
 		$this->bg      = $params['bg'];
 		$this->srcset  = $params['srcset'];
 		$this->sizes   = $params['sizes'];
+		$this->retina  = $retina;
 
 		// save to global.
 		global $rwd_image_options;

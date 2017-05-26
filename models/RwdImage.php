@@ -123,20 +123,21 @@ class RwdImage {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->picture ) ) {
 					continue;
 				}
-
+				//get retina images
+				$retina_src = ', ';
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
-				$template = $option->picture ? $option->picture : $default_template;
-				if ( isset($meta_data['sizes'][ $option->key . '_2x' ] ) ) {
-					$attachment_2x = ', ' . esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) .
-							$meta_data['sizes'][ $option->key . '_2x' ]['file'] . ' 2x'
-						);
-				} else {
-					$attachment_2x = null;
+				if( $option->retina ) {
+					foreach( $option->retina as $retina_key => $retina_value ) {
+						if( $meta_data['sizes'][ $option->key . '_' . $retina_key ] ) {
+							$retina_src .= esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) .
+								$meta_data['sizes'][ $option->key . '_' . $retina_key ]['file'] . ' ' . $retina_key . ', ');
+						}
+					}
 				}
-
+				$template = $option->picture ? $option->picture : $default_template;
 				$tokens   = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ) .
-						$attachment_2x,
+						rtrim( $retina_src, ', ' ),
 					'{alt}'   => $attr['alt'],
 					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);

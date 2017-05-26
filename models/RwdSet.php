@@ -29,6 +29,13 @@ class RwdSet {
 	public $options = array();
 
 	/**
+	 * Retina options.
+	 *
+	 * @var RwdOption[]
+	 */
+	public $retina = array();
+
+	/**
 	 * RwdSet constructor.
 	 *
 	 * @param string $key Base image size key.
@@ -42,19 +49,28 @@ class RwdSet {
 		}
 
 		$this->key = $key;
+		//generate retina sizes array
+		preg_match_all( '/([0-9.,x]+)/', $this->key, $retina_parse );
+		if( $retina_parse ){
+			foreach ( $retina_parse as $key_retina => $retina_value ) {
+				foreach( $retina_value as $value ){
+					$this->retina[$value] = floatval( $value );
+				}
+			}
+		}
 
 		// this means we doesn't have any responsive options (for example this is a small thumbnail).
 		if ( 1 === count( $params ) ) {
-			$this->size = new ImageSize( $key, array_shift( $params ) );
+			$this->size = new ImageSize( $key, array_shift( $params ), $this->retina );
 			$this->options[$key] = new RwdOption( $key, array(
 				array( $this->size->w, $this->size->h, $this->size->crop ),
 				'picture' => '<img srcset="{src}" alt="{alt}">',
 				'bg' => '',
 				'srcset' => '{w}w',
 				'sizes' => '{w}px',
-			));
+			), $this->retina);
 		} else {
-			$this->parse_options( $params );
+			$this->parse_options( $params, $this->retina );
 		}
 
 		// save to global.
@@ -69,7 +85,7 @@ class RwdSet {
 	 *
 	 * @throws \Exception Using unregistered preset.
 	 */
-	public function parse_options( $params ) {
+	public function parse_options( $params, $retina ) {
 		global $rwd_image_options;
 
 		foreach ( $params as $subkey => $conf ) {
@@ -88,12 +104,12 @@ class RwdSet {
 				}
 			} else {
 				$nested_key               = ( $this->key === $subkey ) ? $this->key : "$this->key-$subkey";
-				$this->options[ $subkey ] = new RwdOption( $nested_key, $conf );
+				$this->options[ $subkey ] = new RwdOption( $nested_key, $conf, $retina );
 			}
 		}
 
 		// get first option and take size object to save it as Set size.
 		$first      = reset( $this->options );
-		$this->size = new ImageSize( $this->key, array( $first->size->w, $first->size->h, $first->size->crop ) );
+		$this->size = new ImageSize( $this->key, array( $first->size->w, $first->size->h, $first->size->crop ), $retina );
 	}
 }

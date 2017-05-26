@@ -29,18 +29,11 @@ class ImageSize {
 	public $h;
 
 	/**
-	 * Image width
+	 * Retina sizes
 	 *
-	 * @var int
+	 * @var array
 	 */
-	public $w_2x;
-
-	/**
-	 * Image height
-	 *
-	 * @var int
-	 */
-	public $h_2x;
+	public $retina_descriptor = array();
 
 	/**
 	 * Image crop options
@@ -59,7 +52,7 @@ class ImageSize {
 	 *
 	 * @throws \Exception  Wrong size parameter passed.
 	 */
-	public function __construct( $key, $params ) {
+	public function __construct( $key, $params, $retina ) {
 		if ( ( is_array( $params ) && count( $params ) < 2 )
 			|| ( is_string( $params ) && strpos( $params, 'x' ) === false )
 		) {
@@ -77,10 +70,8 @@ class ImageSize {
 		$this->key  = $key;
 		$this->w    = absint( $params[0] );
 		$this->h    = absint( $params[1] );
-		$this->w_2x    = absint( $params[0] * 2 );
-		$this->h_2x    = absint( $params[1] * 2 );
+		$this->retina_descriptor[$key] = $retina;
 		$this->crop = absint( $params[2] );
-
 		$this->register();
 	}
 
@@ -89,12 +80,23 @@ class ImageSize {
 	 */
 	public function register() {
 		add_image_size( $this->key, $this->w, $this->h, $this->crop );
-		//register 2x retina image
-		add_image_size( $this->key . '_2x', $this->w_2x, $this->h_2x, $this->crop );
+
+		//register retina image size
+		if( $this->retina_descriptor ) {
+			foreach( $this->retina_descriptor as $retina_key => $retina_value ){
+				foreach( $retina_value as $key => $value ){
+					add_image_size( "{$this->key}_{$key}", $this->w * $value, $this->h * $value, $this->crop );
+				}
+			}
+		}
 		if ( in_array( $this->key, array( 'thumbnail', 'medium', 'large', 'medium_large' ) ) ) {
 			update_site_option( "{$this->key}_size_w", $this->w );
 			update_site_option( "{$this->key}_size_h", $this->h );
 			update_site_option( "{$this->key}_crop", ! empty( $this->crop ) );
 		}
+	}
+
+	public static function getRetinaKey(){
+		//TODO: getRetinaKey
 	}
 }
