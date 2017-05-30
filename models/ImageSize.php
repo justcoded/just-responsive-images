@@ -29,13 +29,6 @@ class ImageSize {
 	public $h;
 
 	/**
-	 * Retina sizes
-	 *
-	 * @var array
-	 */
-	public $retina_descriptor = array();
-
-	/**
 	 * Image crop options
 	 *
 	 * @see https://developer.wordpress.org/reference/functions/add_image_size/
@@ -66,13 +59,12 @@ class ImageSize {
 			$params[] = false;
 		}
 		$params = array_values( $params );
-
 		$this->key  = $key;
 		$this->w    = absint( $params[0] );
 		$this->h    = absint( $params[1] );
-		$this->retina_descriptor[$key] = $retina;
 		$this->crop = absint( $params[2] );
 		$this->register();
+		$this->retina_register( $retina );
 	}
 
 	/**
@@ -80,15 +72,6 @@ class ImageSize {
 	 */
 	public function register() {
 		add_image_size( $this->key, $this->w, $this->h, $this->crop );
-
-		//register retina image size
-		if( $this->retina_descriptor ) {
-			foreach( $this->retina_descriptor as $retina_key => $retina_value ){
-				foreach( $retina_value as $key => $value ){
-					add_image_size( "{$this->key}_{$key}", $this->w * $value, $this->h * $value, $this->crop );
-				}
-			}
-		}
 		if ( in_array( $this->key, array( 'thumbnail', 'medium', 'large', 'medium_large' ) ) ) {
 			update_site_option( "{$this->key}_size_w", $this->w );
 			update_site_option( "{$this->key}_size_h", $this->h );
@@ -96,7 +79,28 @@ class ImageSize {
 		}
 	}
 
-	public static function getRetinaKey(){
-		//TODO: getRetinaKey
+	/**
+	 * Call wordpress function to register current retina size.
+	 *
+	 * @param array $retina Retina key.
+	 */
+	public function retina_register( $retina ) {
+		if( $retina ) {
+			foreach( $retina as $retina_key => $value ){
+				add_image_size( self::getRetinaKey( $this->key, $retina_key ), $this->w * $value, $this->h * $value, $this->crop );
+			}
+		}
+	}
+
+	/**
+	 * Generate image size name with retina key
+	 *
+	 * @param string $key Image size unique key.
+	 * @param string $retina_descriptor Image size retina key.
+	 *
+	 * @return string
+	 */
+	public static function getRetinaKey( $key, $retina_descriptor ){
+		return "{$key}_{$retina_descriptor}";
 	}
 }

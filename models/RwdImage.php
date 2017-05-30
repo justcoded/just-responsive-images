@@ -119,25 +119,34 @@ class RwdImage {
 				}
 			}
 			$html .= '>' . $this->eol;
+            
+			// generation src
+			$retina_src = array();
+            
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->picture ) ) {
 					continue;
 				}
-				//get retina images
-				$retina_src = ', ';
+
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+
+				$template = $option->picture ? $option->picture : $default_template;
+
+				// get main responsive image
+				$retina_src['main'] = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'];
+
+				// get retina images
 				if( $option->retina ) {
 					foreach( $option->retina as $retina_key => $retina_value ) {
-						if( $meta_data['sizes'][ $option->key . '_' . $retina_key ] ) {
-							$retina_src .= esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) .
-								$meta_data['sizes'][ $option->key . '_' . $retina_key ]['file'] . ' ' . $retina_key . ', ');
+						if( $meta_data['sizes'][ ImageSize::getRetinaKey( $option->key, $retina_key ) ] ) {
+							$retina_src["{retina}_{$retina_key}"] = esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) .
+								$meta_data['sizes'][ ImageSize::getRetinaKey( $option->key, $retina_key ) ]['file'] . ' ' . $retina_key );
 						}
 					}
+					ksort( $retina_src );
 				}
-				$template = $option->picture ? $option->picture : $default_template;
 				$tokens   = array(
-					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ) .
-						rtrim( $retina_src, ', ' ),
+					'{src}'   => esc_attr( implode(", ", $retina_src) ),
 					'{alt}'   => $attr['alt'],
 					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);

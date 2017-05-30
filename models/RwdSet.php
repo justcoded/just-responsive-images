@@ -48,21 +48,13 @@ class RwdSet {
 			throw new \Exception( "RwdSet::__construct() : Main image size is missing for '$key'" );
 		}
 
-		$this->key = $key;
-		//generate retina sizes array
-		preg_match_all( '/([0-9.,x]+)/', $this->key, $retina_parse );
-		if( $retina_parse ){
-			foreach ( $retina_parse as $key_retina => $retina_value ) {
-				foreach( $retina_value as $value ){
-					$this->retina[$value] = floatval( $value );
-				}
-			}
-		}
+		$this->key = $this->clean_key( $key );
+		$this->parse_retina_options( $key );
 
 		// this means we doesn't have any responsive options (for example this is a small thumbnail).
 		if ( 1 === count( $params ) ) {
-			$this->size = new ImageSize( $key, array_shift( $params ), $this->retina );
-			$this->options[$key] = new RwdOption( $key, array(
+			$this->size = new ImageSize( $this->key, array_shift( $params ), $this->retina );
+			$this->options[$this->key] = new RwdOption( $this->key, array(
 				array( $this->size->w, $this->size->h, $this->size->crop ),
 				'picture' => '<img srcset="{src}" alt="{alt}">',
 				'bg' => '',
@@ -75,7 +67,7 @@ class RwdSet {
 
 		// save to global.
 		global $rwd_image_sizes;
-		$rwd_image_sizes[ $key ] = $this;
+		$rwd_image_sizes[ $this->key ] = $this;
 	}
 
 	/**
@@ -111,5 +103,33 @@ class RwdSet {
 		// get first option and take size object to save it as Set size.
 		$first      = reset( $this->options );
 		$this->size = new ImageSize( $this->key, array( $first->size->w, $first->size->h, $first->size->crop ), $retina );
+	}
+
+	/**
+	 * Parse key to create Retina array options size.
+	 *
+	 * @param string $key Base image size key.
+	 */
+	public function parse_retina_options( $key ) {
+		preg_match_all( '/(\s[0-9.]+x)/', $key, $retina_parse );
+		if( $retina_parse ){
+			foreach( $retina_parse as $key_retina => $retina_value ) {
+				foreach( $retina_value as $value ){
+					$this->retina[ trim($value) ] = floatval( $value );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Clean image size key without retina size.
+	 *
+	 * @param string $key Base image size key.
+	 *
+	 * @return string Image size key.
+	 */
+	public function clean_key( $key ) {
+		preg_match('/^(\s?\S+)/', $key, $clean_key);
+		return trim( $clean_key[0] );
 	}
 }
