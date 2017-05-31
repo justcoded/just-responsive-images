@@ -78,6 +78,21 @@ class RwdImage {
 	}
 
 	/**
+	 * Verify that attachment mime type is SVG image
+	 *
+	 * @param \WP_Post $attachment  Post-attachment object to be validated.
+	 *
+	 * @return boolean
+	 */
+	public function verify_svg_mime_type( $attachment ) {
+		if ( false !== strpos( $attachment->post_mime_type, 'image/svg' ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Generate <picture> tag for the current attachment with specified size
 	 *
 	 * @param string|array $size Required image size.
@@ -214,7 +229,7 @@ class RwdImage {
 				$html .= " $name=" . '"' . $value . '"';
 			}
 			$html .= '>';
-		}
+		} // End if().
 
 		$html = $this->get_warnings_comment() . $html;
 
@@ -304,15 +319,31 @@ class RwdImage {
 
 		$sources          = array();
 		$attachment_meta  = $this->get_attachment_metadata( $this->attachment->ID );
-		$attachment_width = ! empty( $attachment_meta['sizes'][ $this->rwd_set->key ] ) ?
-			$attachment_meta['sizes'][ $this->rwd_set->key ]['width'] : $attachment_meta['width'];
+		$is_attachment_svg = $this->verify_svg_mime_type( $this->attachment );
+
+		// for non-svg define main image size.
+		if ( ! $is_attachment_svg ) {
+			$attachment_width = ! empty( $attachment_meta['sizes'][ $this->rwd_set->key ] ) ?
+				$attachment_meta['sizes'][ $this->rwd_set->key ]['width'] : $attachment_meta['width'];
+		}
 
 		foreach ( $this->rwd_set->options as $subkey => $option ) {
 			$attachment = empty( $this->rwd_rewrite[ $subkey ] ) ? $this->attachment : $this->rwd_rewrite[ $subkey ];
 			$meta_data  = $this->get_attachment_metadata( $attachment->ID );
+			$is_subsize_svg = $this->verify_svg_mime_type( $attachment );
 
-			// for lower images we use max image size for the bigger sizes.
-			if ( ! isset( $meta_data['sizes'][ $option->key ] ) && $meta_data['width'] <= $option->size->w ) {
+			// svg images doesn't have meta data, so we need to generate it.
+			if ( $is_subsize_svg ) {
+				$meta_data['file'] = get_attached_file( $attachment->ID, true );
+				$meta_data['sizes'][ $option->key ] = array(
+					'width' => $option->size->w,
+					'height' => $option->size->h,
+					'file' => basename( $meta_data['file'] ),
+				);
+				// save to cache.
+				$this->set_attachment_metadata( $attachment->ID, $meta_data );
+			} elseif ( ! empty( $meta_data ) && ! isset( $meta_data['sizes'][ $option->key ] ) && $meta_data['width'] <= $option->size->w ) {
+				// for usual images for lower image sizes we will use max image size for the bigger sizes.
 				$meta_data['sizes'][ $option->key ] = array(
 					'width' => $meta_data['width'],
 					'height' => $meta_data['height'],
@@ -329,13 +360,13 @@ class RwdImage {
 			}
 
 			// check that image size width is lower than size width.
-			if ( $attachment_width < $meta_data['sizes'][ $option->key ]['width'] ) {
+			if ( ! $is_attachment_svg && $attachment_width < $meta_data['sizes'][ $option->key ]['width'] ) {
 				continue;
 			}
 
 			$sources[ $subkey ]                  = $meta_data['sizes'][ $option->key ];
 			$sources[ $subkey ]['attachment_id'] = $attachment->ID;
-		}
+		} // End foreach().
 
 		return $sources;
 	}
