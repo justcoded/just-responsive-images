@@ -65,7 +65,7 @@ class ImageSize {
 		$this->h    = absint( $params[1] );
 		$this->crop = absint( $params[2] );
 		$this->register();
-		$this->retina_register( $retina_options );
+		$this->register_retina_sizes( $retina_options );
 	}
 
 	/**
@@ -81,14 +81,14 @@ class ImageSize {
 	}
 
 	/**
-	 * Call wordpress function to register current retina size.
+	 * Register image sizes for retina options.
 	 *
-	 * @param array $retina Retina key.
+	 * @param array $retina_options Retina key.
 	 */
-	public function retina_register( $retina_options ) {
+	public function register_retina_sizes( $retina_options ) {
 		if ( $retina_options ) {
 			foreach ( $retina_options as $retina_descriptor => $multiplier ) {
-				add_image_size( self::getRetinaKey( $this->key, $retina_descriptor ),
+				add_image_size( self::get_retina_key( $this->key, $retina_descriptor ),
 					$this->w * $multiplier,
 					$this->h * $multiplier,
 					$this->crop
@@ -98,14 +98,14 @@ class ImageSize {
 	}
 
 	/**
-	 * Generate image size name with retina key
+	 * Prepare unique image size for retina size.
 	 *
-	 * @param string $key Image size unique key.
-	 * @param string $retina_descriptor Image size retina key.
+	 * @param string $key Image size name.
+	 * @param string $retina_descriptor Retina descriptor (like 2x, 3x).
 	 *
 	 * @return string
 	 */
-	public static function getRetinaKey( $key, $retina_descriptor ) {
-		return "{$key}_{$retina_descriptor}";
+	public static function get_retina_key( $key, $retina_descriptor ) {
+		return "{$key} @{$retina_descriptor}";
 	}
 }

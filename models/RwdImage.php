@@ -120,43 +120,35 @@ class RwdImage {
 			}
 			$html .= '>' . $this->eol;
 
-			// generation src.
-			$retina_src = array();
-
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->picture ) ) {
 					continue;
 				}
 
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+				$baseurl = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
 
-				$template = $option->picture ? $option->picture : $default_template;
-
-				// get main responsive image.
-				$retina_src['main'] = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'];
-
-				// get retina images.
+				$src = array( $baseurl . $sources[ $subkey ]['file'] );
+				// get retina sources.
 				if ( $option->retina_options ) {
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
-						// get retina size.
-						$retina_size = $meta_data['sizes'][ ImageSize::getRetinaKey( $option->key, $retina_descriptor ) ];
-						if ( $retina_size ) {
-							$retina_src[ "{retina}_{$retina_descriptor}" ] = esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) .
-							$retina_size['file'] . ' ' . $retina_descriptor );
+						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
+							$src[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_descriptor;
 						}
 					}
-					ksort( $retina_src );
 				}
 				$tokens   = array(
-					'{src}'   => esc_attr( implode( ', ', $retina_src ) ),
+					'{src}'   => esc_attr( implode( ', ', $src ) ),
 					'{alt}'   => $attr['alt'],
 					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);
 
+				$template = $option->picture ? $option->picture : $default_template;
 				$html .= strtr( $template, $tokens ) . $this->eol;
 			}
 			$html .= '</picture>';
-		}
+		} // End if().
 
 		$html = $this->get_warnings_comment() . $html;
 

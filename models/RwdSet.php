@@ -83,7 +83,7 @@ class RwdSet {
 		foreach ( $params as $subkey => $conf ) {
 			// If we have numeric key, that means we set dimension for the Set itself.
 			// If we find numeric index not first time - this is error in config, however we just add numeric suffix and continue.
-			if ( is_numeric( $subkey ) && 0 == $subkey ) {
+			if ( is_numeric( $subkey ) && 0 === $subkey ) {
 				$subkey = $this->key;
 			}
 
@@ -112,13 +112,12 @@ class RwdSet {
 	 */
 	public function parse_retina_options( $key ) {
 		// generate retina keys array.
-		preg_match_all( '/(\s[0-9.]+x)/', $key, $retina_parse );
-		if ( $retina_parse ) {
-			foreach ( $retina_parse as $retina_options => $retina_descriptor ) {
-				foreach ( $retina_descriptor as $multiplier ) {
-					if ( ! empty( floatval( $multiplier ) ) ) {
-						$this->retina_options[ trim( $multiplier ) ] = floatval( $multiplier );
-					}
+		preg_match_all( '/(\s([0-9.]+x))/', $key, $retina_parse );
+		if ( ! empty( $retina_parse[2] ) ) {
+			foreach ( $retina_parse[2] as $descriptor ) {
+				$multiplier = floatval( $descriptor );
+				if ( 0 < $multiplier ) {
+					$this->retina_options[ $descriptor ] = $multiplier;
 				}
 			}
 		}
