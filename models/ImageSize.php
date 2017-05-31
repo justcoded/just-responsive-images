@@ -42,10 +42,11 @@ class ImageSize {
 	 *
 	 * @param string       $key Image size unique key.
 	 * @param array|string $params Size width, height, crop  options.
+	 * @param array        $retina_options Retina options.
 	 *
 	 * @throws \Exception  Wrong size parameter passed.
 	 */
-	public function __construct( $key, $params, $retina ) {
+	public function __construct( $key, $params, $retina_options ) {
 		if ( ( is_array( $params ) && count( $params ) < 2 )
 			|| ( is_string( $params ) && strpos( $params, 'x' ) === false )
 		) {
@@ -64,7 +65,7 @@ class ImageSize {
 		$this->h    = absint( $params[1] );
 		$this->crop = absint( $params[2] );
 		$this->register();
-		$this->retina_register( $retina );
+		$this->retina_register( $retina_options );
 	}
 
 	/**
@@ -84,10 +85,14 @@ class ImageSize {
 	 *
 	 * @param array $retina Retina key.
 	 */
-	public function retina_register( $retina ) {
-		if( $retina ) {
-			foreach( $retina as $retina_key => $value ){
-				add_image_size( self::getRetinaKey( $this->key, $retina_key ), $this->w * $value, $this->h * $value, $this->crop );
+	public function retina_register( $retina_options ) {
+		if ( $retina_options ) {
+			foreach ( $retina_options as $retina_descriptor => $multiplier ) {
+				add_image_size( self::getRetinaKey( $this->key, $retina_descriptor ),
+					$this->w * $multiplier,
+					$this->h * $multiplier,
+					$this->crop
+				);
 			}
 		}
 	}
@@ -100,7 +105,7 @@ class ImageSize {
 	 *
 	 * @return string
 	 */
-	public static function getRetinaKey( $key, $retina_descriptor ){
+	public static function getRetinaKey( $key, $retina_descriptor ) {
 		return "{$key}_{$retina_descriptor}";
 	}
 }

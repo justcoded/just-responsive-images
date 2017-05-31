@@ -33,7 +33,7 @@ class RwdSet {
 	 *
 	 * @var RwdOption[]
 	 */
-	public $retina = array();
+	public $retina_options = array();
 
 	/**
 	 * RwdSet constructor.
@@ -53,16 +53,16 @@ class RwdSet {
 
 		// this means we doesn't have any responsive options (for example this is a small thumbnail).
 		if ( 1 === count( $params ) ) {
-			$this->size = new ImageSize( $this->key, array_shift( $params ), $this->retina );
-			$this->options[$this->key] = new RwdOption( $this->key, array(
+			$this->size = new ImageSize( $this->key, array_shift( $params ), $this->retina_options );
+			$this->options[ $this->key ] = new RwdOption( $this->key, array(
 				array( $this->size->w, $this->size->h, $this->size->crop ),
 				'picture' => '<img srcset="{src}" alt="{alt}">',
 				'bg' => '',
 				'srcset' => '{w}w',
 				'sizes' => '{w}px',
-			), $this->retina);
+			), $this->retina_options);
 		} else {
-			$this->parse_options( $params, $this->retina );
+			$this->parse_options( $params );
 		}
 
 		// save to global.
@@ -77,7 +77,7 @@ class RwdSet {
 	 *
 	 * @throws \Exception Using unregistered preset.
 	 */
-	public function parse_options( $params, $retina ) {
+	public function parse_options( $params ) {
 		global $rwd_image_options;
 
 		foreach ( $params as $subkey => $conf ) {
@@ -96,40 +96,43 @@ class RwdSet {
 				}
 			} else {
 				$nested_key               = ( $this->key === $subkey ) ? $this->key : "$this->key-$subkey";
-				$this->options[ $subkey ] = new RwdOption( $nested_key, $conf, $retina );
+				$this->options[ $subkey ] = new RwdOption( $nested_key, $conf, $this->retina_options );
 			}
 		}
 
 		// get first option and take size object to save it as Set size.
 		$first      = reset( $this->options );
-		$this->size = new ImageSize( $this->key, array( $first->size->w, $first->size->h, $first->size->crop ), $retina );
+		$this->size = new ImageSize( $this->key, array( $first->size->w, $first->size->h, $first->size->crop ), $this->retina_options );
 	}
 
 	/**
-	 * Parse key to create Retina array options size.
+	 * Parse argument to create Retina array options size.
 	 *
 	 * @param string $key Base image size key.
 	 */
 	public function parse_retina_options( $key ) {
+		// generate retina keys array.
 		preg_match_all( '/(\s[0-9.]+x)/', $key, $retina_parse );
-		if( $retina_parse ){
-			foreach( $retina_parse as $key_retina => $retina_value ) {
-				foreach( $retina_value as $value ){
-					$this->retina[ trim($value) ] = floatval( $value );
+		if ( $retina_parse ) {
+			foreach ( $retina_parse as $retina_options => $retina_descriptor ) {
+				foreach ( $retina_descriptor as $multiplier ) {
+					if ( ! empty( floatval( $multiplier ) ) ) {
+						$this->retina_options[ trim( $multiplier ) ] = floatval( $multiplier );
+					}
 				}
 			}
 		}
 	}
 
 	/**
-	 * Clean image size key without retina size.
+	 * Clean image size key without retina sizes.
 	 *
 	 * @param string $key Base image size key.
 	 *
 	 * @return string Image size key.
 	 */
 	public function clean_key( $key ) {
-		preg_match('/^(\s?\S+)/', $key, $clean_key);
-		return trim( $clean_key[0] );
+		$clean_key = preg_replace( '/(\s[0-9.]+x)/', null , $key );
+		return trim( $clean_key );
 	}
 }
