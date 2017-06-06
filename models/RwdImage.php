@@ -198,20 +198,30 @@ class RwdImage {
 			$src = '';
 			$srcset = array();
 			$sizes = array();
-
 			// generation of responsive sizes.
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
 					continue;
 				}
-
+				$baseurl = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
 				$tokens    = array(
 					'{src}'   => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
 					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
 				);
-
+				// get retina sources.
+				if ( $option->retina_options ) {
+					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
+							$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
+							if ( ! empty( $retina_width ) ) {
+								$srcset[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
+							}
+						}
+					}
+				}
 				$src = $tokens['{src}'];
 				$srcset[] = strtr( "{src} $option->srcset", $tokens );
 				$sizes[] = strtr( $option->sizes, $tokens );
@@ -257,7 +267,7 @@ class RwdImage {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->bg ) ) {
 					continue;
 				}
-
+				$baseurl = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
 				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
 				$src = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'];
@@ -265,6 +275,25 @@ class RwdImage {
 
 				if ( ! isset( $rwd_background_styles[ $media ] ) ) {
 					$rwd_background_styles[ $media ] = array();
+				}
+
+				// get retina sources.
+				if ( $option->retina_options ) {
+					// get bg media size.
+					preg_match( '/\((.+)\)/', $option->bg, $bg_media_size );
+					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+						// Check media pixel and media resolution dpi.
+						$media_pixel_ration = ( $multiplier < 2.5 ? 1.5 : 2.5 );
+						$media_resolution = ( $multiplier < 2.5 ? '144dpi' : '192dpi' );
+
+						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+
+						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
+							$bg_src_retina = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
+							$bg_media_retina = "{$option->bg} and (-webkit-min-device-pixel-ratio:{$media_pixel_ration}), {$bg_media_size[0]} and (min-resolution : {$media_resolution})";
+							$rwd_background_styles[ $bg_media_retina ][ $selector ] = "$selector{background-image:url('$bg_src_retina');}";
+						}
+					}
 				}
 
 				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
