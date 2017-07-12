@@ -8,7 +8,7 @@ return array(
 		array(
 			array( 640, 480 ),
 			'picture' => '<source srcset="{src}" media="(min-width: 415px)">',
-			'bg' => '',
+			'bg' => '@media (min-width: 415px)',
 			'srcset' => '{w}w',
 			'sizes' => '(min-width: 415px) {w}px',
 		),
@@ -18,7 +18,7 @@ return array(
 		array(
 			array( 1100, 800 ),
 			'picture' => '<source srcset="{src}" media="(min-width: 981px)">',
-			'bg' => '',
+			'bg' => '@media (min-width: 981px)',
 			'srcset' => '{w}w',
 			'sizes' => '(min-width: 981px) {w}px',
 		),
@@ -29,7 +29,7 @@ return array(
 		array(
 			array( 1600, 1200 ),
 			'picture' => '<source srcset="{src}" media="(min-width: 1281px)">',
-			'bg' => '',
+			'bg' => '@media (min-width: 1281px)',
 			'srcset' => '{w}w',
 			'sizes' => '(min-width: 1281px) {w}px',
 		),
