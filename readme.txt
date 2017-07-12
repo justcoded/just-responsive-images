@@ -37,6 +37,11 @@ https://github.com/justcoded/just-responsive-images.
 
 Feel free to post your suggestions or bugs under Issues section on github.
 
+**IMPORTANT**
+
+In version 1.2 default RWD set background options updated to mobile-first strategy (from desktop-first).
+If you use nested rules from RWD set you should update your main size background option to have @media query with `min-width` rule.
+
 == Installation ==
 
 1. Download, unzip and upload to your WordPress plugins directory
@@ -49,6 +54,9 @@ Feel free to post your suggestions or bugs under Issues section on github.
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.2 - 12 July 2017 =
+	* New: True retina support
+	* Bug fix: responsive image with "img" tag does not work in different IE/Edge versions
 = Version 1.1.4 - 4 May 2017 =
 	* New: SVG images support (If user used SVG instead of usual image - it will be printed)
 = Version 1.1.3 - 25 April 2017 =

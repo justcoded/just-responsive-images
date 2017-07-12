@@ -185,42 +185,92 @@ it like this:
 		),
 	);
 	
+#### Retina support
+	
+To support retina screens and print both usual and bigger images 
+	you should add retina multiplier to your size name, separated with a space:
+
+	return array(
+		'visual 2x' => array( ... ),
+	);
+
+You can add more different multipliers for same size to generate even more retina sizes:
+
+	return array(
+		'visual 2x 3x' => array( ... ),
+	);
+
+However we recommend to use one retina size - `2x`, this size provides good visual image quality on screen and keep your file space less 
+(comparing to setting several retina multipliers).
+
+##### Retina background @media queries
+
+By default plugin search such patterns inside `'bg'` property: 
+	
+	(min-width: XXXpx) or (max-width: XXXpx)
+	
+If such entries found, then plugin replace them with the structure below to generate @media retina query:
+ 
+ 	(min-width: XXXpx) and <min device pixel ratio query>, (min-width: XXXpx) and <min resolution query>
+ 	 
+If you want to set your own specific media query for retina size you can use `'bg_retina'` property like this:
+
+	return array(
+		'big-banner' => array(
+			array(
+				array( 2400, 500, true ),
+				...
+				'bg' => '@media (min-width:1281px)',
+				'bg_retina' => '@media (min-width:1281px) and {dpr}, (min-width:1281px) and {min_res}',
+				...
+			),
+			...
+		),
+	);
+
+Special tokens `{dpr}` and `{min_res}` will be automatically replaced with a corresponding min device pixel ratio
+	and min resolution values based on retina multiplier (2x or 3x).
+	
 #### Pre-defined RWD set
 
 The plugin has its own set of rwd styles, which are optimal for big images display and resize them to smaller 
-resolutions, which passed Google Page Speed tests well.
+resolutions, which passed Google Page Speed tests well. This set has retina 2x support by default.
 
 It looks like this:
 
 	return array(
-		'rwd' => array(
+		'rwd 2x' => array(
 			'desktop' => array(
 				array( 1920, 9999 ),
 				'picture' => '<source srcset="{src}" media="(min-width: 1281px)">',
-				'bg' => '@media screen and (min-width:1281px)', // main image.
-				'srcset' => '1920w',
-				'sizes' => '(min-width: 1281px) 1920px',
+				'bg' => '@media (min-width:1281px)',
+				'bg_retina' => '@media (min-width:1281px) and {dpr}, (min-width:1281px) and {min_res}',
+				'srcset' => '{w}w',
+				'sizes' => '(min-width: 1281px) {w}px',
 			),
 			'laptop' => array(
 				array( 1280, 9999 ),
 				'picture' => '<source srcset="{src}" media="(min-width: 981px)">',
-				'bg' => '@media screen and (max-width:1280px)',
-				'srcset' => '1280w',
-				'sizes' => '(min-width: 981px) 1280px',
+				'bg' => '@media (min-width: 981px) ',
+				'bg_retina' => '@media (min-width: 981px) and {dpr}, (min-width: 981px) and {min_res}',
+				'srcset' => '{w}w',
+				'sizes' => '(min-width: 981px) {w}px',
 			),
 			'tablet' => array(
 				array( 980, 9999 ),
 				'picture' => '<source srcset="{src}" media="(min-width: 415px)">',
-				'bg' => '@media screen and (max-width:980px)',
-				'srcset' => '980w',
-				'sizes' => '(min-width: 415px) 980px',
+				'bg' => '@media (min-width: 415px)',
+				'bg_retina' => '@media (min-width: 415px) and {dpr}, (min-width: 415px) and {min_res}',
+				'srcset' => '{w}w',
+				'sizes' => '(min-width: 415px) {w}px',
 			),
 			'mobile' => array(
 				array( 414, 9999 ),
-				'picture' => '<img srcset="{src}" alt="{alt}">', // main img.
-				'bg' => '@media screen and (max-width:414px)',
-				'srcset' => '414w',
-				'sizes' => '414px',
+				'picture' => '<img src="{src}" srcset="{src}" alt="{alt}">', // mobile-first strategy picture img.
+				'bg' => '',                                                 // mobile-first strategy bg.
+				'bg_retina' => '@media {dpr}, {min_res}',
+				'srcset' => '{w}w',
+				'sizes' => '{w}px',
 			),
 		),
 	);
@@ -253,6 +303,11 @@ Let's check the example:
 			'mobile' => $mobile_image_id, // rewrite a key under 'visual' main size to use another image 
 	));
 	
+**Important**: If you use retina multipliers we do not recommend to use `'img'` tag with sized array. 
+In this case browser will automatically decide which image will be renedered and you won't get the same 
+images on specific resolution in all browsers/devices.
+
+	
 ### rwd_attachment_background
 	
 `rwd_attachment_background( $selector, $attachment = null, $size = 'thumbnail' )`	
@@ -279,40 +334,53 @@ It can generate code similar to this one:
 
 	<picture>
 		<source srcset="image-desktop.jpg, image-desktop-2x.jpg 2x" media="(min-width: 1281px)"><!-- 1920px image!-->
-		<source srcset="image-landscape.jpg" media="(min-width: 981px)"><!-- 1280px !-->
-		<source srcset="image-tablet.jpg" media="(min-width: 415px)"><!-- 980px image!-->
-		<img srcset="image-mobile.jpg" alt="test"> <!-- 414px image!-->
+		<source srcset="image-landscape.jpg, image-landscape-2x.jpg 2x" media="(min-width: 981px)"><!-- 1280px !-->
+		<source srcset="image-tablet.jpg, image-tablet-2x.jpg 2x" media="(min-width: 415px)"><!-- 980px image!-->
+		<img srcset="image-mobile.jpg, image-mobile-2x.jpg 2x" alt="test"> <!-- 414px image!-->
 	</picture>
 	
 **img**
 	
 	<img sizes="(min-width: 1281px) 1920px, (min-width: 981px) 1280px, (min-width: 415px) 980px, 414px"
          srcset="examples/images/medium.jpg 414w,
+         examples/images/medium-2x.jpg 828w,
          examples/images/large.jpg 980w,
+         examples/images/large-2x.jpg 1960w,
          examples/images/extralarge.jpg 1280w,
          examples/images/extralarge-2x.jpg 2560w,
-         examples/images/extralarge.jpg 1920w" alt="...">
+         examples/images/desctop.jpg 1920w,
+         examples/images/desctop-2x.jpg 3840w" alt="...">
          
 **background**
     
     <style type="text/css">
     	/* rwd-background-styles */
-    	.art-img {
-    		background-image: url(images/article-bg-hd.jpg);
+    	.article-bg {
+    		background-image: url('images/bg-mobile.jpg');
     	}
-    	@media screen and (max-width:1280px) {
-    		.art-img {
-    			background-image: url(images/article-bg-landscape.jpg);
+    	@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+    		.article-bg {
+    			background-image: url('images/bg-mobile-2x.jpg');
     		}
     	}
-    	@media screen and (max-width:980px) {
-    		.art-img {
-    			background-image: url(images/article-bg-tablet.jpg);
+    	@media (min-width: 981px) {
+    		.article-bg {
+    			background-image: url('images/bg-laptop.jpg');
     		}
     	}
-    	@media screen and (max-width:414px) {
-    		.art-img {
-    			background-image: url(build/images/article-bg-mobile.jpg);
+    	@media (min-width: 981px) and (-webkit-min-device-pixel-ratio: 1.5), (min-width: 981px) and (min-resolution: 144dpi) {
+    		.article-bg {
+    			background-image: url('images/bg-laptop-2x.jpg');
     		}
     	}
-    </style>     
+    	@media (min-width: 415px) {
+    		.article-bg {
+    			background-image: url('images/bg-tablet.jpg');
+    		}
+    	}
+    	@media (min-width: 415px) and (-webkit-min-device-pixel-ratio: 1.5), (min-width: 415px) and (min-resolution: 144dpi) {
+    		.article-bg {
+    			background-image: url('images/bg-tablet-2x.jpg');
+    		}
+    	}
+    </style> 

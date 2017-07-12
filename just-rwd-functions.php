@@ -99,6 +99,6 @@ function rwd_print_styles() {
 		$media_css = implode( ' ', $selectors );
 		$styles .= " $media{ $media_css } ";
 	}
-	print '<style type="text/css">/* rwd-background-styles */' . $styles . '</style>';
+	print "<style type=\"text/css\">/* rwd-background-styles */ {$styles}</style> \n";
 	$rwd_background_styles = array();
 }
