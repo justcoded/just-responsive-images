@@ -37,6 +37,11 @@ https://github.com/justcoded/just-responsive-images.
 
 Feel free to post your suggestions or bugs under Issues section on github.
 
+**IMPORTANT**
+
+In version 1.2 default RWD set background options updated to mobile-first strategy (from desktop-first).
+If you use nested rules from RWD set you should update your main size background option to have @media query with `min-width` rule.
+
 == Installation ==
 
 1. Download, unzip and upload to your WordPress plugins directory
