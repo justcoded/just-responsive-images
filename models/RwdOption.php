@@ -1,4 +1,5 @@
 <?php
+
 namespace jri\models;
 
 /**
@@ -36,6 +37,13 @@ class RwdOption {
 	public $bg = null;
 
 	/**
+	 * Background retina media wrappers
+	 *
+	 * @var string|null
+	 */
+	public $bg_retina = null;
+
+	/**
 	 * Img tag `srcset` attribute part
 	 *
 	 * @var string|null
@@ -65,20 +73,35 @@ class RwdOption {
 	 */
 	public function __construct( $key, $params, $retina_options ) {
 		$params = array_merge( array(
-			'picture' => null,
-			'bg'      => null,
-			'srcset'  => null,
-			'sizes'   => null,
+			'picture'   => null,
+			'bg'        => null,
+			'bg_retina' => null,
+			'srcset'    => null,
+			'sizes'     => null,
 		), $params );
-		if ( !isset($params[0]) ) $params[0] = '';
+		if ( ! isset( $params[0] ) ) {
+			$params[0] = '';
+		}
 
-		$this->key     = $key;
-		$this->size    = new ImageSize( $key, $params[0], $retina_options );
-		$this->picture = $params['picture'];
-		$this->bg      = $params['bg'];
-		$this->srcset  = $params['srcset'];
-		$this->sizes   = $params['sizes'];
-		$this->retina_options  = $retina_options;
+		$this->key            = $key;
+		$this->size           = new ImageSize( $key, $params[0], $retina_options );
+		$this->picture        = $params['picture'];
+		$this->bg             = $params['bg'];
+		$this->bg_retina      = $params['bg_retina'];
+		$this->srcset         = $params['srcset'];
+		$this->sizes          = $params['sizes'];
+		$this->retina_options = $retina_options;
+
+		if ( ! empty( $this->retina_options ) && empty( $this->bg_retina ) ) {
+			if ( empty( $this->bg ) ) {
+				$this->bg_retina = '@media {dpr}, {min_res}';
+			} else {
+				preg_match( '%\(\b(max-width.*?|min-width.*?)\b\)%', $this->bg, $bg_media_size );
+				$pattern = str_replace( $bg_media_size[0], "{$bg_media_size[0]} and {dpr}, {$bg_media_size[0]} and {min_res}", $this->bg );
+				// fix old settings and remove "screen and" option from media query.
+				$this->bg_retina = str_replace( 'screen and ', '', $pattern );
+			}
+		}
 
 		// save to global.
 		global $rwd_image_options;

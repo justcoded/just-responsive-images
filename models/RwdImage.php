@@ -214,8 +214,8 @@ class RwdImage {
 				if ( $option->retina_options ) {
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-						$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
-						if ( ! empty( $retina_width ) ) {
+						if ( ! empty( $meta_data['sizes'][ $retina_image_size ]['width'] ) ) {
+							$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
 							$srcset[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
 						}
 					}
@@ -277,8 +277,6 @@ class RwdImage {
 
 				// get retina sources.
 				if ( $option->retina_options ) {
-					// get bg media size.
-					preg_match( '%\(\b(max-width.*?|min-width.*?)\b\)%', $option->bg, $bg_media_size );
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 						// Check media pixel and media resolution dpi.
 						$media_pixel_ration = ( $multiplier < 2.5 ? 1.5 : 2.5 );
@@ -287,16 +285,19 @@ class RwdImage {
 						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
 
 						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
-							$bg_src_retina = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
-							$bg_media_retina = "{$option->bg} and (-webkit-min-device-pixel-ratio:{$media_pixel_ration}), {$bg_media_size[0]} and (min-resolution : {$media_resolution})";
-							$rwd_background_styles[ $bg_media_retina ][ $selector ] = "$selector{background-image:url('$bg_src_retina');}";
+							$src_retina = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
+							$media_retina = strtr($option->bg_retina, array(
+								'{dpr}' => "(-webkit-min-device-pixel-ratio:{$media_pixel_ration})",
+								'{min_res}' => "(min-resolution : {$media_resolution})",
+							));
+							$rwd_background_styles[ $media_retina ][ $selector ] = "$selector{background-image:url('$src_retina');}";
 						}
 					}
 				}
 
 				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
-			}
-		}
+			} // End foreach().
+		} // End if().
 
 		return $this->get_warnings_comment();
 	}
