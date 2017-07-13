@@ -222,12 +222,16 @@ class RwdImage {
 				}
 				$src = $tokens['{src}'];
 				$srcset[] = strtr( "{src} $option->srcset", $tokens );
-				$sizes[] = strtr( $option->sizes, $tokens );
+				if ( $option->sizes ) {
+					$sizes[] = strtr( $option->sizes, $tokens );
+				}
 			}
 
 			$attr['src'] = $src;
 			$attr['srcset'] = implode( ', ', $srcset );
-			$attr['sizes'] = implode( ', ', $sizes );
+			if ( ! empty( $sizes ) ) {
+				$attr['sizes'] = implode( ', ', $sizes );
+			}
 
 			// the part taken from WP core.
 			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
