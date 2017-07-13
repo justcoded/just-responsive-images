@@ -260,8 +260,13 @@ class RwdImage {
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			global $rwd_background_styles;
 
+			// define the strategy: mobile- or desktop- first. Desktop-first will start from empty media query, mobile-first will start with min-width media query.
+			$rwd_options = $this->rwd_set->options;
+			if ( false !== strpos( reset( $rwd_options )->bg, 'min-width' ) ) {
+				$rwd_options = array_reverse( $rwd_options, true );
+			}
 			// generation of responsive sizes.
-			foreach ( $this->rwd_set->options as $subkey => $option ) {
+			foreach ( $rwd_options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->bg ) ) {
 					continue;
 				}
@@ -274,6 +279,7 @@ class RwdImage {
 				if ( ! isset( $rwd_background_styles[ $media ] ) ) {
 					$rwd_background_styles[ $media ] = array();
 				}
+				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
 
 				// get retina sources.
 				if ( $option->retina_options ) {
@@ -290,12 +296,13 @@ class RwdImage {
 								'{dpr}' => "(-webkit-min-device-pixel-ratio:{$media_pixel_ration})",
 								'{min_res}' => "(min-resolution : {$media_resolution})",
 							));
+							if ( ! isset( $rwd_background_styles[ $media_retina ] ) ) {
+								$rwd_background_styles[ $media_retina ] = array();
+							}
 							$rwd_background_styles[ $media_retina ][ $selector ] = "$selector{background-image:url('$src_retina');}";
 						}
 					}
-				}
-
-				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
+				} // End if().
 			} // End foreach().
 		} // End if().
 
@@ -504,5 +511,18 @@ class RwdImage {
 		global $rwd_image_sizes;
 
 		return $rwd_image_sizes;
+	}
+
+	/**
+	 * List of primary sizes, which should be printed before all other styles
+	 *
+	 * @return array
+	 */
+	public static function get_background_primary_sizes() {
+		return array(
+			'', // no media query.
+			'@media (-webkit-min-device-pixel-ratio:1.5), (min-resolution : 144dpi)', // 2x retina media query.
+			'@media (-webkit-min-device-pixel-ratio:2.5), (min-resolution : 192dpi)', // 3x retina media query.
+		);
 	}
 }

@@ -85,20 +85,23 @@ function rwd_print_styles() {
 	}
 
 	$styles = '';
-	if ( ! empty( $rwd_background_styles[''] ) ) {
-		$media_css = implode( ' ', $rwd_background_styles[''] );
-		$styles .= " $media_css ";
-		unset( $rwd_background_styles[''] );
-	}
 
-	foreach ( $rwd_background_styles as $media => $selectors ) {
-		if ( empty( $selectors ) ) {
+	$primary_media = RwdImage::get_background_primary_sizes();
+	// merge with media keys to get correct sorting.
+	$ordered_styles = array_merge( array_flip( $primary_media ), $rwd_background_styles );
+	foreach ( $ordered_styles as $media => $selectors ) {
+		if ( empty( $selectors ) || ! is_array( $selectors ) ) {
 			continue;
 		}
 
 		$media_css = implode( ' ', $selectors );
-		$styles .= " $media{ $media_css } ";
+		if ( '' === $media ) {
+			$styles .= " $media_css ";
+		} else {
+			$styles .= " $media{ $media_css } ";
+		}
 	}
+
 	print "<style type=\"text/css\">/* rwd-background-styles */ {$styles}</style> \n";
 	$rwd_background_styles = array();
 }
