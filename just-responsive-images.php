@@ -52,6 +52,7 @@ class JustResponsiveImages extends core\Singleton {
 		self::$version     = 1.200;
 
 		// init features, which this plugin is created for.
+		new components\Maintenance();
 		new components\PostAttachment();
 		new components\MediaMetaInfo();
 		new components\UploadsCleanup();
