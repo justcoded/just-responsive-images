@@ -108,6 +108,10 @@ class PostAttachment {
 		$rwd_set     = $rwd_image_sizes[ $this->calculated_image_size ];
 		$rwd_sources = array();
 
+		if ( ! isset( $image_meta['sizes'][ $rwd_set->key ] ) ) {
+			return $sources;
+		}
+
 		$set_image_width = $image_meta['sizes'][ $rwd_set->key ]['width'];
 		foreach ( $rwd_set->options as $rwd_option ) {
 			// check that we have image resized in required image size.
@@ -154,6 +158,10 @@ class PostAttachment {
 
 		$rwd_set   = $rwd_image_sizes[ $this->calculated_image_size ];
 		$rwd_sizes = array();
+
+		if ( ! isset( $image_meta['sizes'][ $rwd_set->key ] ) ) {
+			return $sizes;
+		}
 
 		$set_image_width = $image_meta['sizes'][ $rwd_set->key ]['width'];
 		foreach ( $rwd_set->options as $rwd_option ) {
