@@ -153,10 +153,11 @@ class RwdImage {
 						}
 					}
 				}
-				$tokens   = array(
-					'{src}'   => esc_attr( implode( ', ', $src ) ),
-					'{alt}'   => $attr['alt'],
-					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
+				$tokens = array(
+					'{src}'        => esc_attr( implode( ', ', $src ) ),
+					'{alt}'        => $attr['alt'],
+					'{w}'          => $meta_data['sizes'][ $option->key ]['width'],
+					'{single-src}' => reset( $src ),
 				);
 
 				$template = $option->picture ? $option->picture : $default_template;
