@@ -362,7 +362,17 @@ class RwdImage {
 
 			// svg images doesn't have meta data, so we need to generate it.
 			if ( $is_subsize_svg ) {
-				$meta_data['file'] = get_attached_file( $attachment->ID, true );
+
+				if ( ! is_array( $meta_data ) ) {
+					$meta_data = array();
+				}
+
+				$upload_dir        = wp_upload_dir();
+				$meta_data['file'] = str_replace(
+					$upload_dir['basedir'] . '/',
+					'',
+					get_attached_file( $attachment->ID, true ) );
+
 				$meta_data['sizes'][ $option->key ] = array(
 					'width' => $option->size->w,
 					'height' => $option->size->h,
