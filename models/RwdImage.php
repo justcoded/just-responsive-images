@@ -387,11 +387,6 @@ class RwdImage {
 				continue;
 			}
 
-			// check that image size width is lower than size width.
-			if ( ! $is_attachment_svg && $attachment_width < $meta_data['sizes'][ $option->key ]['width'] ) {
-				continue;
-			}
-
 			$sources[ $subkey ]                  = $meta_data['sizes'][ $option->key ];
 			$sources[ $subkey ]['attachment_id'] = $attachment->ID;
 		} // End foreach().
