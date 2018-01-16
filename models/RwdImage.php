@@ -184,12 +184,6 @@ class RwdImage {
 			return '';
 		}
 
-//		/*check if svg and print it*/
-//		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
-//
-//			return $this->svg($size, $attributes);
-//		}
-
 		$html = '';
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			// prepare image attributes (class, alt, title etc).
