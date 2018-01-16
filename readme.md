@@ -216,7 +216,7 @@ If such entries found, then plugin replace them with the structure below to gene
 If you want to set your own specific media query for retina size you can use `'bg_retina'` property like this:
 
 	return array(
-		'big-banner' => array(
+		'big-banner 2x' => array(
 			array(
 				array( 2400, 500, true ),
 				...
@@ -363,16 +363,6 @@ It can generate code similar to this one:
     			background-image: url('images/bg-mobile-2x.jpg');
     		}
     	}
-    	@media (min-width: 981px) {
-    		.article-bg {
-    			background-image: url('images/bg-laptop.jpg');
-    		}
-    	}
-    	@media (min-width: 981px) and (-webkit-min-device-pixel-ratio: 1.5), (min-width: 981px) and (min-resolution: 144dpi) {
-    		.article-bg {
-    			background-image: url('images/bg-laptop-2x.jpg');
-    		}
-    	}
     	@media (min-width: 415px) {
     		.article-bg {
     			background-image: url('images/bg-tablet.jpg');
@@ -381,6 +371,16 @@ It can generate code similar to this one:
     	@media (min-width: 415px) and (-webkit-min-device-pixel-ratio: 1.5), (min-width: 415px) and (min-resolution: 144dpi) {
     		.article-bg {
     			background-image: url('images/bg-tablet-2x.jpg');
+    		}
+    	}
+    	@media (min-width: 981px) {
+    		.article-bg {
+    			background-image: url('images/bg-laptop.jpg');
+    		}
+    	}
+    	@media (min-width: 981px) and (-webkit-min-device-pixel-ratio: 1.5), (min-width: 981px) and (min-resolution: 144dpi) {
+    		.article-bg {
+    			background-image: url('images/bg-laptop-2x.jpg');
     		}
     	}
     </style> 

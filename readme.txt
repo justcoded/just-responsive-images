@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, responsive post thumbnail background, responsiv
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.4
-Tested up to: 4.7.2
+Tested up to: 4.8
 License: GPL3
 Stable tag: trunk
 
@@ -55,7 +55,7 @@ To upgrade remove the old plugin folder. After than follow the installation step
 
 == Changelog ==
 = Version 1.3 - 16 January 2018 =
-	* Bug fix: print svg image with width and height attributes
+	* Update: If medis is SVG - then we always print <img> with hard-coded width/height attributes from configuration array
 = Version 1.2.1 - 12 September 2017 =
 	* Bug fix: Small images generate warning in featured image box
 = Version 1.2 - 12 July 2017 =
