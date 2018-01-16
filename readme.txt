@@ -54,6 +54,8 @@ If you use nested rules from RWD set you should update your main size background
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.2.1 - 16 January 2018 =
+	* Bug fix: print svg image with width and height attributes
 = Version 1.2 - 12 July 2017 =
 	* New: True retina support
 	* Bug fix: responsive image with "img" tag does not work in different IE/Edge versions
