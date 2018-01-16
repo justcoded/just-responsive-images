@@ -323,18 +323,19 @@ class RwdImage {
 	 */
 	public function svg( $size, $attributes ) {
 		$attr = array();
-		$this->set_sizes( $size );
 
 		if ( ! empty( $attributes['class'] ) ) {
 			$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
 		}
 
 		$attr = array_merge( $attr, $attributes );
-
 		$attr['src']    = esc_url( wp_get_attachment_url( $this->attachment->ID ) );
-		$attr['width']  = $this->rwd_set->size->w;
-		$attr['height'] = $this->rwd_set->size->h;
 		$attr['alt']    = trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) );
+
+		if ( $this->set_sizes( $size ) ) {
+			$attr['width']  = $this->rwd_set->size->w;
+			$attr['height'] = $this->rwd_set->size->h;
+		}
 
 		// the part taken from WP core.
 		$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
