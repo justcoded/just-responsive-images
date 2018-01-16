@@ -105,6 +105,11 @@ class RwdImage {
 			return '';
 		}
 
+		/* Check if svg and print it */
+		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
+			return $this->svg($size, $attributes);
+		}
+
 		$html = '';
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			// prepare image attributes (class, alt, title etc).
@@ -182,6 +187,11 @@ class RwdImage {
 	public function img( $size, $attributes = array() ) {
 		if ( ! $this->attachment ) {
 			return '';
+		}
+
+		/* Check if svg and print it */
+		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
+			return $this->svg($size, $attributes);
 		}
 
 		$html = '';
@@ -319,40 +329,17 @@ class RwdImage {
 				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-image",
 				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
 			);
+
 			if ( ! empty( $attributes['class'] ) ) {
 				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
 			}
+
 			$attr = array_merge( $attr, $attributes );
 
-			$src    = '';
-			$width  = '';
-			$height = '';
-
-			// generation of responsive sizes.
-			foreach ( $this->rwd_set->options as $subkey => $option ) {
-				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
-					continue;
-				}
-				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
-
-				$tokens = array(
-					'{src}' => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
-					'{w}'   => $meta_data['sizes'][ $option->key ]['width'],
-				);
-
-				if ( ! $width ) {
-					$width = $meta_data['sizes'][ $option->key ]['width'];
-				}
-				if ( ! $height ) {
-					$height = $meta_data['sizes'][ $option->key ]['height'];
-				}
-
-				$src = $tokens['{src}'];
-			}
-
-			$attr['src']    = $src;
-			$attr['width']  = $width;
-			$attr['height'] = $height;
+			$attr['src']    = esc_attr( $this->get_attachment_baseurl( $sources[ $size ]['attachment_id'] )
+			                            . $sources[ $size ]['file'] );
+			$attr['width']  = $sources[ $size ]['width'];
+			$attr['height'] = $sources[ $size ]['height'];
 
 			// the part taken from WP core.
 			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
