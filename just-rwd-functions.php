@@ -45,6 +45,12 @@ function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag
 	$rwd_image = new RwdImage( $attachment );
 
 	$size = apply_filters( 'post_thumbnail_size', $size );
+
+	/* Check if svg and print it */
+	if ( $rwd_image->verify_svg_mime_type( $rwd_image->attachment ) ) {
+		return $rwd_image->svg($size, $attr);
+	}
+
 	if ( 'img' != $tag ) {
 		$html = $rwd_image->picture( $size, $attr );
 	} else {

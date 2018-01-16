@@ -184,6 +184,12 @@ class RwdImage {
 			return '';
 		}
 
+//		/*check if svg and print it*/
+//		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
+//
+//			return $this->svg($size, $attributes);
+//		}
+
 		$html = '';
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			// prepare image attributes (class, alt, title etc).
@@ -301,6 +307,72 @@ class RwdImage {
 		} // End if().
 
 		return $this->get_warnings_comment();
+	}
+
+	/**
+	 * Generate img tag for svg image
+	 *
+	 * @param string       $selector CSS selector.
+	 * @param string|array $size Required image size.
+	 *
+	 * @return string Generated html comments warnings.
+	 */
+	public function svg( $size, $attributes ) {
+
+		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
+			// prepare image attributes (class, alt, title etc).
+			$attr = array(
+				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-image",
+				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
+			);
+			if ( ! empty( $attributes['class'] ) ) {
+				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
+			}
+			$attr = array_merge( $attr, $attributes );
+
+			$src    = '';
+			$width  = '';
+			$height = '';
+
+			// generation of responsive sizes.
+			foreach ( $this->rwd_set->options as $subkey => $option ) {
+				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
+					continue;
+				}
+				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+
+				$tokens = array(
+					'{src}' => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
+					'{w}'   => $meta_data['sizes'][ $option->key ]['width'],
+				);
+
+				if ( ! $width ) {
+					$width = $meta_data['sizes'][ $option->key ]['width'];
+				}
+				if ( ! $height ) {
+					$height = $meta_data['sizes'][ $option->key ]['height'];
+				}
+
+				$src = $tokens['{src}'];
+			}
+
+			$attr['src']    = $src;
+			$attr['width']  = $width;
+			$attr['height'] = $height;
+
+			// the part taken from WP core.
+			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
+			$attr = array_map( 'esc_attr', $attr );
+			$html = '<img';
+			foreach ( $attr as $name => $value ) {
+				$html .= " $name=" . '"' . $value . '"';
+			}
+			$html .= '>';
+		} // End if().
+
+		$html = $this->get_warnings_comment() . $html;
+
+		return $html;
 	}
 
 	/**
