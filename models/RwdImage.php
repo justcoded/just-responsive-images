@@ -322,34 +322,28 @@ class RwdImage {
 	 * @return string Generated html comments warnings.
 	 */
 	public function svg( $size, $attributes ) {
+		$attr = array();
+		$this->set_sizes( $size );
 
-		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
-			// prepare image attributes (class, alt, title etc).
-			$attr = array(
-				'class' => "attachment-{$this->rwd_set->key} size-{$this->rwd_set->key} wp-post-image",
-				'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
-			);
+		if ( ! empty( $attributes['class'] ) ) {
+			$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
+		}
 
-			if ( ! empty( $attributes['class'] ) ) {
-				$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
-			}
+		$attr = array_merge( $attr, $attributes );
 
-			$attr = array_merge( $attr, $attributes );
+		$attr['src']    = esc_url( wp_get_attachment_url( $this->attachment->ID ) );
+		$attr['width']  = $this->rwd_set->size->w;
+		$attr['height'] = $this->rwd_set->size->h;
+		$attr['alt']    = trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) );
 
-			$attr['src']    = esc_attr( $this->get_attachment_baseurl( $sources[ $size ]['attachment_id'] )
-			                            . $sources[ $size ]['file'] );
-			$attr['width']  = $sources[ $size ]['width'];
-			$attr['height'] = $sources[ $size ]['height'];
-
-			// the part taken from WP core.
-			$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
-			$attr = array_map( 'esc_attr', $attr );
-			$html = '<img';
-			foreach ( $attr as $name => $value ) {
-				$html .= " $name=" . '"' . $value . '"';
-			}
-			$html .= '>';
-		} // End if().
+		// the part taken from WP core.
+		$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
+		$attr = array_map( 'esc_attr', $attr );
+		$html = '<img';
+		foreach ( $attr as $name => $value ) {
+			$html .= " $name=" . '"' . $value . '"';
+		}
+		$html .= '>';
 
 		$html = $this->get_warnings_comment() . $html;
 
