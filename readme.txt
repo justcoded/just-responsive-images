@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, responsive post thumbnail background, responsiv
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.4
-Tested up to: 4.8
+Tested up to: 4.9.1
 License: GPL3
 Stable tag: trunk
 
