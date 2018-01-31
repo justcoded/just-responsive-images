@@ -45,6 +45,7 @@ function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag
 	$rwd_image = new RwdImage( $attachment );
 
 	$size = apply_filters( 'post_thumbnail_size', $size );
+
 	if ( 'img' != $tag ) {
 		$html = $rwd_image->picture( $size, $attr );
 	} else {

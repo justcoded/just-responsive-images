@@ -105,6 +105,11 @@ class RwdImage {
 			return '';
 		}
 
+		/* Check if svg and print it */
+		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
+			return $this->svg($size, $attributes);
+		}
+
 		$html = '';
 		if ( $this->set_sizes( $size ) && $sources = $this->get_set_sources() ) {
 			// prepare image attributes (class, alt, title etc).
@@ -153,10 +158,11 @@ class RwdImage {
 						}
 					}
 				}
-				$tokens   = array(
-					'{src}'   => esc_attr( implode( ', ', $src ) ),
-					'{alt}'   => $attr['alt'],
-					'{w}'     => $meta_data['sizes'][ $option->key ]['width'],
+				$tokens = array(
+					'{src}'        => esc_attr( implode( ', ', $src ) ),
+					'{alt}'        => $attr['alt'],
+					'{w}'          => $meta_data['sizes'][ $option->key ]['width'],
+					'{single-src}' => reset( $src ),
 				);
 
 				$template = $option->picture ? $option->picture : $default_template;
@@ -181,6 +187,11 @@ class RwdImage {
 	public function img( $size, $attributes = array() ) {
 		if ( ! $this->attachment ) {
 			return '';
+		}
+
+		/* Check if svg and print it */
+		if ( $this->verify_svg_mime_type( $this->attachment ) ) {
+			return $this->svg($size, $attributes);
 		}
 
 		$html = '';
@@ -314,6 +325,44 @@ class RwdImage {
 	}
 
 	/**
+	 * Generate img tag for svg image
+	 *
+	 * @param string       $selector CSS selector.
+	 * @param string|array $size Required image size.
+	 *
+	 * @return string Generated html comments warnings.
+	 */
+	public function svg( $size, $attributes ) {
+		$attr = array();
+
+		if ( ! empty( $attributes['class'] ) ) {
+			$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
+		}
+
+		$attr = array_merge( $attr, $attributes );
+		$attr['src']    = esc_url( wp_get_attachment_url( $this->attachment->ID ) );
+		$attr['alt']    = trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) );
+
+		if ( $this->set_sizes( $size ) ) {
+			$attr['width']  = $this->rwd_set->size->w;
+			$attr['height'] = $this->rwd_set->size->h;
+		}
+
+		// the part taken from WP core.
+		$attr = apply_filters( 'wp_get_attachment_image_attributes', $attr, $this->attachment, $this->rwd_set->key );
+		$attr = array_map( 'esc_attr', $attr );
+		$html = '<img';
+		foreach ( $attr as $name => $value ) {
+			$html .= " $name=" . '"' . $value . '"';
+		}
+		$html .= '>';
+
+		$html = $this->get_warnings_comment() . $html;
+
+		return $html;
+	}
+
+	/**
 	 * Set rwd_set and rwd_rewrite based on size.
 	 *
 	 * @param string|array $size Required image size.
@@ -373,7 +422,17 @@ class RwdImage {
 
 			// svg images doesn't have meta data, so we need to generate it.
 			if ( $is_subsize_svg ) {
-				$meta_data['file'] = get_attached_file( $attachment->ID, true );
+
+				if ( ! is_array( $meta_data ) ) {
+					$meta_data = array();
+				}
+
+				$upload_dir        = wp_upload_dir();
+				$meta_data['file'] = str_replace(
+					$upload_dir['basedir'] . '/',
+					'',
+					get_attached_file( $attachment->ID, true ) );
+
 				$meta_data['sizes'][ $option->key ] = array(
 					'width' => $option->size->w,
 					'height' => $option->size->h,
@@ -395,11 +454,6 @@ class RwdImage {
 			// however if we didn't find correct size - we skip this size with warning.
 			if ( ! isset( $meta_data['sizes'][ $option->key ] ) ) {
 				$this->warnings[] = "Attachment {$attachment->ID}: missing image size \"{$this->rwd_set->key}:{$subkey}\"";
-				continue;
-			}
-
-			// check that image size width is lower than size width.
-			if ( ! $is_attachment_svg && $attachment_width < $meta_data['sizes'][ $option->key ]['width'] ) {
 				continue;
 			}
 
