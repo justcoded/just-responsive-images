@@ -54,6 +54,8 @@ If you use nested rules from RWD set you should update your main size background
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.3.1 - 31 January 2018 =
+	* Update: Add alt to svg and set default class
 = Version 1.3 - 16 January 2018 =
 	* Update: If medis is SVG - then we always print <img> with hard-coded width/height attributes from configuration array
 = Version 1.2.1 - 12 September 2017 =
