@@ -28,7 +28,7 @@ return array(
 		),
 		'mobile' => array(
 			array( 414, 9999 ),
-			'picture' => '<img src="{src}" srcset="{src}" alt="{alt}">', // mobile-first strategy picture img.
+			'picture' => '<img src="{single-src}" srcset="{src}" alt="{alt}">', // mobile-first strategy picture img.
 			'bg' => '',                                                 // mobile-first strategy bg.
 			'bg_retina' => '@media {dpr}, {min_res}',
 			'srcset' => '{w}w',
