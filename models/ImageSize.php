@@ -65,35 +65,16 @@ class ImageSize {
 		$this->h    = absint( $params[1] );
 		$this->crop = absint( $params[2] );
 		$this->register();
-		$this->register_retina_sizes( $retina_options );
 	}
 
 	/**
 	 * Call wordpress function to register current valid size.
 	 */
 	public function register() {
-		add_image_size( $this->key, $this->w, $this->h, $this->crop );
 		if ( in_array( $this->key, array( 'thumbnail', 'medium', 'large', 'medium_large' ) ) ) {
 			update_site_option( "{$this->key}_size_w", $this->w );
 			update_site_option( "{$this->key}_size_h", $this->h );
 			update_site_option( "{$this->key}_crop", ! empty( $this->crop ) );
-		}
-	}
-
-	/**
-	 * Register image sizes for retina options.
-	 *
-	 * @param array $retina_options Retina key.
-	 */
-	public function register_retina_sizes( $retina_options ) {
-		if ( $retina_options ) {
-			foreach ( $retina_options as $retina_descriptor => $multiplier ) {
-				add_image_size( self::get_retina_key( $this->key, $retina_descriptor ),
-					$this->w * $multiplier,
-					$this->h * $multiplier,
-					$this->crop
-				);
-			}
 		}
 	}
 
