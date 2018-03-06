@@ -508,8 +508,10 @@ class RwdImage {
 					'crop'       => '',
 				);
 			}
+			$upload_dir    = wp_get_upload_dir();
+			$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
 			if ( $meta_data['sizes'][ $key ]['rwd_width'] != $width || $meta_data['sizes'][ $key ]['rwd_height'] != $height
-			     || $meta_data['sizes'][ $key ]['crop'] != $crop
+			     || $meta_data['sizes'][ $key ]['crop'] != $crop || ! file_exists( $image_baseurl )
 			) {
 				// Get WP Image Editor Instance
 				$image_path   = get_attached_file( $attach_id );
