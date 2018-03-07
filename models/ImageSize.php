@@ -63,7 +63,11 @@ class ImageSize {
 		$this->key  = $key;
 		$this->w    = absint( $params[0] );
 		$this->h    = absint( $params[1] );
-		$this->crop = absint( $params[2] );
+		if( is_array( $params[2] ) ) {
+			$this->crop = $params[2];
+		} else {
+			$this->crop = absint( $params[2] );
+		}
 		$this->register();
 	}
 

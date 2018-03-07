@@ -508,24 +508,12 @@ class RwdImage {
 
 			return $meta_data;
 		}
-		// set RWD size config
-		if ( ! isset( $meta_data['sizes'][ $key ] ) ) {
-			$meta_data['sizes'][ $key ] = array(
-				'rwd_width'  => $width,
-				'rwd_height' => $height,
-				'crop'       => $crop,
-			);
-		} elseif ( ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) ) {
-			$meta_data['sizes'][ $key ] = array(
-				'rwd_width'  => $width,
-				'rwd_height' => $height,
-				'crop'       => $crop,
-			);
-		}
 		$upload_dir    = wp_get_upload_dir();
 		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
-		if ( $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
-		     || $meta_data['sizes'][ $key ]['crop'] !== $crop || ! file_exists( $image_baseurl )
+
+		if ( ! file_exists( $image_baseurl ) || ( ! isset( $meta_data['sizes'][ $key ] ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) )
+			|| ( $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
+			|| strcmp( serialize( $crop ), serialize( $meta_data['sizes'][ $key ]['crop'] ) ) !== 0 )
 		) {
 			// Get WP Image Editor Instance
 			$image_path   = get_attached_file( $attach_id );
@@ -550,10 +538,6 @@ class RwdImage {
 						'file'       => $resize_filename,
 						'mime-type'  => get_post_mime_type( $attach_id ),
 					);
-					// save to cache.
-					$this->set_attachment_metadata( $attach_id, $meta_data );
-					// update metadata.
-					wp_update_attachment_metadata( $attach_id, $meta_data );
 				} else {
 					// use max image size for the bigger sizes.
 					if ( ! strpos( $key, '@' ) ) {
@@ -569,14 +553,13 @@ class RwdImage {
 					} else {
 						unset( $meta_data['sizes'][ $key ] );
 					}
-					// save to cache.
-					$this->set_attachment_metadata( $attach_id, $meta_data );
-					// update metadata.
-					wp_update_attachment_metadata( $attach_id, $meta_data );
 				}
+				// save to cache.
+				$this->set_attachment_metadata( $attach_id, $meta_data );
+				// update metadata.
+				wp_update_attachment_metadata( $attach_id, $meta_data );
 			}
 		}
-
 		return $meta_data;
 	}
 
