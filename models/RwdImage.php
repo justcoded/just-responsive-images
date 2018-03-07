@@ -95,8 +95,8 @@ class RwdImage {
 	/**
 	 * Generate <picture> tag for the current attachment with specified size
 	 *
-	 * @param string|array $size Required image size.
-	 * @param array $attributes Additional html attributes to be used for main tag.
+	 * @param string|array $size       Required image size.
+	 * @param array        $attributes Additional html attributes to be used for main tag.
 	 *
 	 * @return string
 	 */
@@ -179,8 +179,8 @@ class RwdImage {
 	/**
 	 * Generate <img> tag for the current attachment with specified size
 	 *
-	 * @param string|array $size Required image size.
-	 * @param array $attributes Additional html attributes to be used for main tag.
+	 * @param string|array $size       Required image size.
+	 * @param array        $attributes Additional html attributes to be used for main tag.
 	 *
 	 * @return string
 	 */
@@ -262,8 +262,8 @@ class RwdImage {
 	/**
 	 * Generate background media queries
 	 *
-	 * @param string $selector CSS selector.
-	 * @param string|array $size Required image size.
+	 * @param string       $selector CSS selector.
+	 * @param string|array $size     Required image size.
 	 *
 	 * @return string Generated html comments warnings.
 	 */
@@ -327,8 +327,8 @@ class RwdImage {
 	/**
 	 * Generate img tag for svg image
 	 *
-	 * @param string $selector CSS selector.
-	 * @param string|array $size Required image size.
+	 * @param string|array $size       Required image size.
+	 * @param array        $attributes Image attributes.
 	 *
 	 * @return string Generated html comments warnings.
 	 */
@@ -481,12 +481,12 @@ class RwdImage {
 	/**
 	 * Dynamically resize image.
 	 *
-	 * @param int $attach_id Attachment ID.
-	 * @param array $meta_data Attachment meta data.
-	 * @param string $key Image size key.
-	 * @param int $width Image width.
-	 * @param int $height Image height.
-	 * @param int $crop Crop image.
+	 * @param int    $attach_id Attachment ID.
+	 * @param array  $meta_data Attachment meta data.
+	 * @param string $key       Image size key.
+	 * @param int    $width     Image width.
+	 * @param int    $height    Image height.
+	 * @param int    $crop      Crop image.
 	 *
 	 * @return array
 	 */
@@ -494,12 +494,12 @@ class RwdImage {
 		if ( ! empty( $meta_data ) && ! isset( $meta_data['sizes'][ $key ] ) && $meta_data['width'] <= $width ) {
 			// for usual images for lower image sizes we will use max image size for the bigger sizes.
 			$meta_data['sizes'][ $key ] = array(
-				'width'  => $meta_data['width'],
-				'height' => $meta_data['height'],
-				'file'   => basename( $meta_data['file'] ),
-				'rwd_width'  => '',
-				'rwd_height' => '',
-				'crop'       => '',
+				'width'      => $meta_data['width'],
+				'height'     => $meta_data['height'],
+				'file'       => basename( $meta_data['file'] ),
+				'rwd_width'  => $width,
+				'rwd_height' => $height,
+				'crop'       => $crop,
 			);
 			// save to cache.
 			$this->set_attachment_metadata( $attach_id, $meta_data );
@@ -511,15 +511,15 @@ class RwdImage {
 		// set RWD size config
 		if ( ! isset( $meta_data['sizes'][ $key ] ) ) {
 			$meta_data['sizes'][ $key ] = array(
-				'rwd_width'  => '',
-				'rwd_height' => '',
-				'crop'       => '',
+				'rwd_width'  => $width,
+				'rwd_height' => $height,
+				'crop'       => $crop,
 			);
-		} elseif( ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) ) {
+		} elseif ( ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) ) {
 			$meta_data['sizes'][ $key ] = array(
-				'rwd_width'  => '',
-				'rwd_height' => '',
-				'crop'       => '',
+				'rwd_width'  => $width,
+				'rwd_height' => $height,
+				'crop'       => $crop,
 			);
 		}
 		$upload_dir    = wp_get_upload_dir();
@@ -533,10 +533,13 @@ class RwdImage {
 			if ( ! is_wp_error( $image_editor ) ) {
 				// Create new image
 				$auto_height = ( $height == 19998 || $height == 9999 ? null : $height );
+				// WP Image Editor resize
 				$image_editor->resize( $width, $auto_height, $crop );
+				// Generate filename
 				$resize_filename = basename( $image_editor->generate_filename() );
 				$resize_sizes    = $image_editor->get_size();
 				if ( $meta_data['width'] >= $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] ) {
+					// WP Image Editor save image
 					$image_editor->save();
 					$meta_data['sizes'][ $key ] = array(
 						'width'      => $resize_sizes['width'],
@@ -558,9 +561,9 @@ class RwdImage {
 							'width'      => $meta_data['width'],
 							'height'     => $meta_data['height'],
 							'file'       => basename( $meta_data['file'] ),
-							'rwd_width'  => '',
-							'rwd_height' => '',
-							'crop'       => '',
+							'rwd_width'  => $width,
+							'rwd_height' => $height,
+							'crop'       => $crop,
 							'mime-type'  => get_post_mime_type( $attach_id ),
 						);
 					} else {
@@ -636,8 +639,8 @@ class RwdImage {
 	/**
 	 * Set updated values to cache
 	 *
-	 * @param int $attachment_id Attachment post to update it's metadata cache.
-	 * @param array $meta_data New meta data values.
+	 * @param int   $attachment_id Attachment post to update it's metadata cache.
+	 * @param array $meta_data     New meta data values.
 	 */
 	protected function set_attachment_metadata( $attachment_id, $meta_data ) {
 		static::$meta_datas[ $attachment_id ] = $meta_data;
