@@ -59,41 +59,23 @@ class ImageSize {
 		if ( 3 > count( $params ) ) {
 			$params[] = false;
 		}
-		$params = array_values( $params );
+		$params     = array_values( $params );
 		$this->key  = $key;
-		$this->w    = absint( $params[0] );
-		$this->h    = absint( $params[1] );
-		$this->crop = absint( $params[2] );
+		$this->w    = ! is_null( $params[0] ) ? absint( $params[0] ) : null;
+		$this->h    = ! is_null( $params[1] ) ? absint( $params[1] ) : null;
+		$this->crop = is_array( $params[2] ) ? $params[2] : absint( $params[2] );
+
 		$this->register();
-		$this->register_retina_sizes( $retina_options );
 	}
 
 	/**
-	 * Call wordpress function to register current valid size.
+	 * Call WordPress function to register current valid size.
 	 */
 	public function register() {
-		add_image_size( $this->key, $this->w, $this->h, $this->crop );
-		if ( in_array( $this->key, array( 'thumbnail', 'medium', 'large', 'medium_large' ) ) ) {
+		if ( in_array( $this->key, array( 'thumbnail', 'medium', 'large', 'medium_large' ), true ) ) {
 			update_site_option( "{$this->key}_size_w", $this->w );
 			update_site_option( "{$this->key}_size_h", $this->h );
 			update_site_option( "{$this->key}_crop", ! empty( $this->crop ) );
-		}
-	}
-
-	/**
-	 * Register image sizes for retina options.
-	 *
-	 * @param array $retina_options Retina key.
-	 */
-	public function register_retina_sizes( $retina_options ) {
-		if ( $retina_options ) {
-			foreach ( $retina_options as $retina_descriptor => $multiplier ) {
-				add_image_size( self::get_retina_key( $this->key, $retina_descriptor ),
-					$this->w * $multiplier,
-					$this->h * $multiplier,
-					$this->crop
-				);
-			}
 		}
 	}
 
@@ -107,5 +89,16 @@ class ImageSize {
 	 */
 	public static function get_retina_key( $key, $retina_descriptor ) {
 		return "{$key} @{$retina_descriptor}";
+	}
+
+	/**
+	 * Convert crop parameter to a single string to be able compare it.
+	 *
+	 * @param bool|array $crop Crop parameter.
+	 *
+	 * @return string Crop string value.
+	 */
+	public static function crop_string( $crop ) {
+		return is_array( $crop ) ? implode( ',', $crop ) : (string) $crop;
 	}
 }
