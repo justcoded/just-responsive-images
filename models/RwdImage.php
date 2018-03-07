@@ -508,7 +508,14 @@ class RwdImage {
 
 			return $meta_data;
 		}
+		// set RWD size config
 		if ( ! isset( $meta_data['sizes'][ $key ] ) ) {
+			$meta_data['sizes'][ $key ] = array(
+				'rwd_width'  => '',
+				'rwd_height' => '',
+				'crop'       => '',
+			);
+		} elseif( ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) ) {
 			$meta_data['sizes'][ $key ] = array(
 				'rwd_width'  => '',
 				'rwd_height' => '',
@@ -529,7 +536,7 @@ class RwdImage {
 				$image_editor->resize( $width, $auto_height, $crop );
 				$resize_filename = basename( $image_editor->generate_filename() );
 				$resize_sizes    = $image_editor->get_size();
-				if ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] ) {
+				if ( $meta_data['width'] >= $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] ) {
 					$image_editor->save();
 					$meta_data['sizes'][ $key ] = array(
 						'width'      => $resize_sizes['width'],
