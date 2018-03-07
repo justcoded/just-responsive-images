@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, responsive post thumbnail background, responsiv
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.4
-Tested up to: 4.9.1
+Tested up to: 4.9.4
 License: GPL3
 Stable tag: trunk
 
@@ -14,22 +14,13 @@ Providing full control to set your own responsive image properties for WP 4.4+, 
 
 == Description ==
 
-The Just Responsive Images plugin gives you control of responsive image properties,
-which WordPress 4.4+ inserts to all post thumbnails by default.
+The Just Responsive Images plugin gives you control of responsive image properties, which WordPress 4.4+ inserts to all post thumbnails by default.
 
-The default solution is to insert all available image sizes as srcset attribute into img tag. This is not optimal,
-because the browser gets too much image resolutions, it can generate more requests to the server (to get the right image)
-and it takes longer to display the image itself. Not to mention, Google Page Speed inspector is not satisfied with
-such a method.
+The default solution is to insert all available image sizes as srcset attribute into img tag. This is not optimal, because the browser gets too much image resolutions, it can generate more requests to the server (to get the right image) and it takes longer to display the image itself. Not to mention, Google Page Speed inspector is not satisfied with such a method.
 
-If you have hand-coded a mobile-friendly HTML/CSS for your theme it usually has media queries for background images
-and &lt;picture&gt; tags instead of &lt;img&gt; tags. A lot of images are used as block backgrounds very often,
-which should be editable from CMS. All these best practices are not supported in the WordPress core by default and
-you end up wasting your time re-writing standard functions.
+If you have hand-coded a mobile-friendly HTML/CSS for your theme it usually has media queries for background images and &lt;picture&gt; tags instead of &lt;img&gt; tags. A lot of images are used as block backgrounds very often, which should be editable from CMS. All these best practices are not supported in the WordPress core by default and you end up wasting your time re-writing standard functions.
 
-That's why we're here! We want to provide easy-to-use control for customizing srcset for each image size dimension you
-use inside your theme. Also we're happy to provide you with a few helpers which will generate tags and generate required
-media queries for backgrounds.
+That's why we're here! We want to provide easy-to-use control for customizing srcset for each image size dimension you use inside your theme. Also we're happy to provide you with a few helpers which will generate tags and generate required media queries for backgrounds.
 
 
 Full documentation and configuration options are available on our github page:
