@@ -431,7 +431,8 @@ class RwdImage {
 				$meta_data['file'] = str_replace(
 					$upload_dir['basedir'] . '/',
 					'',
-					get_attached_file( $attachment->ID, true ) );
+					get_attached_file( $attachment->ID, true )
+				);
 
 				$meta_data['sizes'][ $option->key ] = array(
 					'width'  => $option->size->w,
@@ -441,7 +442,7 @@ class RwdImage {
 				// save to cache.
 				$this->set_attachment_metadata( $attachment->ID, $meta_data );
 			} else {
-				// Resize image
+				// Resize image if not exists.
 				$meta_data = $this->resize_image(
 					$attachment->ID,
 					$meta_data,
@@ -450,7 +451,7 @@ class RwdImage {
 					$option->size->h,
 					$option->size->crop
 				);
-				// Resize retina image
+				// Resize retina images if not exists.
 				if ( $option->retina_options ) {
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 						$meta_data = $this->resize_image(
@@ -491,6 +492,8 @@ class RwdImage {
 	 * @return array
 	 */
 	public function resize_image( $attach_id, $meta_data, $key, $width, $height, $crop ) {
+		$crop_str = ImageSize::crop_string( $crop );
+
 		if ( ! empty( $meta_data ) && ! isset( $meta_data['sizes'][ $key ] ) && $meta_data['width'] <= $width ) {
 			// for usual images for lower image sizes we will use max image size for the bigger sizes.
 			$meta_data['sizes'][ $key ] = array(
@@ -499,7 +502,7 @@ class RwdImage {
 				'file'       => basename( $meta_data['file'] ),
 				'rwd_width'  => $width,
 				'rwd_height' => $height,
-				'crop'       => $crop,
+				'crop'       => $crop_str,
 			);
 			// save to cache.
 			$this->set_attachment_metadata( $attach_id, $meta_data );
@@ -508,33 +511,35 @@ class RwdImage {
 
 			return $meta_data;
 		}
+
 		$upload_dir    = wp_get_upload_dir();
 		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
 
-		if ( ! file_exists( $image_baseurl ) || ( ! isset( $meta_data['sizes'][ $key ] ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] ) )
-			|| ( $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
-			|| strcmp( serialize( $crop ), serialize( $meta_data['sizes'][ $key ]['crop'] ) ) !== 0 )
+		if ( ! file_exists( $image_baseurl ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] )
+			|| $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
+			|| ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
 		) {
-			// Get WP Image Editor Instance
+			// Get WP Image Editor Instance.
 			$image_path   = get_attached_file( $attach_id );
 			$image_editor = wp_get_image_editor( $image_path );
 			if ( ! is_wp_error( $image_editor ) ) {
-				// Create new image
-				$auto_height = ( $height == 19998 || $height == 9999 ? null : $height );
-				// WP Image Editor resize
-				$image_editor->resize( $width, $auto_height, $crop );
-				// Generate filename
+				// Create new image.
+				$auto_width  = ( 19998 === $width || 9999 === $width ? null : $width );
+				$auto_height = ( 19998 === $height || 9999 === $height ? null : $height );
+				// WP Image Editor resize.
+				$image_editor->resize( $auto_width, $auto_height, $crop );
+				// Generate filename.
 				$resize_filename = basename( $image_editor->generate_filename() );
 				$resize_sizes    = $image_editor->get_size();
-				if ( $meta_data['width'] >= $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] ) {
-					// WP Image Editor save image
+				if ( $meta_data['width'] >= $resize_sizes['width'] && $meta_data['height'] >= $resize_sizes['height'] ) {
+					// WP Image Editor save image.
 					$image_editor->save();
 					$meta_data['sizes'][ $key ] = array(
 						'width'      => $resize_sizes['width'],
 						'height'     => $resize_sizes['height'],
 						'rwd_width'  => $width,
 						'rwd_height' => $height,
-						'crop'       => $crop,
+						'crop'       => $crop_str,
 						'file'       => $resize_filename,
 						'mime-type'  => get_post_mime_type( $attach_id ),
 					);
@@ -547,7 +552,7 @@ class RwdImage {
 							'file'       => basename( $meta_data['file'] ),
 							'rwd_width'  => $width,
 							'rwd_height' => $height,
-							'crop'       => $crop,
+							'crop'       => $crop_str,
 							'mime-type'  => get_post_mime_type( $attach_id ),
 						);
 					} else {
@@ -560,6 +565,7 @@ class RwdImage {
 				wp_update_attachment_metadata( $attach_id, $meta_data );
 			}
 		}
+
 		return $meta_data;
 	}
 
