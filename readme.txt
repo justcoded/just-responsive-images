@@ -84,6 +84,7 @@ To upgrade remove the old plugin folder. After than follow the installation step
 == Changelog ==
 = Version 1.4 - 7 March 2018 =
 	* Upgrate: Changed image size generation to generate images on request from site frontend. This impact site speed on first page request!
+	* Update: Add alt to svg and set default class
 = Version 1.3 - 16 January 2018 =
 	* Update: If media is SVG - then we always print <img> with hard-coded width/height attributes from configuration array
 = Version 1.2.1 - 12 September 2017 =

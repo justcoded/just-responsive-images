@@ -333,7 +333,12 @@ class RwdImage {
 	 * @return string Generated html comments warnings.
 	 */
 	public function svg( $size, $attributes ) {
-		$attr = array();
+
+		// prepare image attributes (class, alt, title etc).
+		$attr = array(
+			'class' => "wp-post-image",
+			'alt'   => trim( strip_tags( get_post_meta( $this->attachment->ID, '_wp_attachment_image_alt', true ) ) ),
+		);
 
 		if ( ! empty( $attributes['class'] ) ) {
 			$attributes['class'] = $attr['class'] . ' ' . $attributes['class'];
