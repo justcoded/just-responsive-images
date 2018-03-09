@@ -82,6 +82,8 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.4.1 - 9 March 2018 =
+    * Bug fix: Wrong image source taken when image crop enabled and original width/height is the same and required height/width are less than origin.
 = Version 1.4 - 7 March 2018 =
 	* Upgrate: Changed image size generation to generate images on request from site frontend. This impact site speed on first page request!
 	* Update: Add alt to svg and set default class

@@ -518,7 +518,13 @@ class RwdImage {
 				// Generate filename.
 				$resize_filename = basename( $image_editor->generate_filename() );
 				$resize_sizes    = $image_editor->get_size();
-				if ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] ) {
+
+				// We taked resized image only if we sure that resize was successful and resized dimensions are correct.
+				// - if original image is bigger than resized copy - resize was successful.
+				if ( ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] )
+					// - if crop enabled and resized image match the requested size - resize was successful.
+					|| ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
+				) {
 					// WP Image Editor save image.
 					$image_editor->save();
 					$meta_data['sizes'][ $key ] = array(
