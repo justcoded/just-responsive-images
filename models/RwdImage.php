@@ -558,12 +558,12 @@ class RwdImage {
 						unset( $meta_data['sizes'][ $key ] );
 					}
 				}
-				// update JIO attachment status
-				update_post_meta( $attach_id, '_just_img_opt_status', self::STATUS_IN_QUEUE );
 				// save to cache.
 				$this->set_attachment_metadata( $attach_id, $meta_data );
 				// update metadata.
 				wp_update_attachment_metadata( $attach_id, $meta_data );
+				// update JIO attachment status
+				update_post_meta( $attach_id, '_just_img_opt_status', self::STATUS_IN_QUEUE );
 			}
 		}
 

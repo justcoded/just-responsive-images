@@ -226,7 +226,7 @@ class PostAttachment {
 			$_wp_additional_image_sizes[ $subkey ] = array(
 				'width'  => $option->size->w,
 				'height' => $option->size->h,
-				'crop'   => is_array( $option->size->crop ) ? $option->size->crop : absint( $option->size->crop ),
+				'crop'   => $option->size->crop,
 			);
 			$image_sizes[] = $subkey;
 			if ( $option->retina_options ) {
@@ -235,7 +235,7 @@ class PostAttachment {
 					$_wp_additional_image_sizes[ $retina_key ] = array(
 						'width'  => $option->size->w * $multiplier,
 						'height' => $option->size->h * $multiplier,
-						'crop'   => is_array( $option->size->crop ) ? $option->size->crop : absint( $option->size->crop ),
+						'crop'   => $option->size->crop,
 					);
 					$image_sizes[] = $retina_key;
 				}
