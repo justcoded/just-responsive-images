@@ -76,6 +76,7 @@ class ImageSize {
 			update_site_option( "{$this->key}_size_w", $this->w );
 			update_site_option( "{$this->key}_size_h", $this->h );
 			update_site_option( "{$this->key}_crop", ! empty( $this->crop ) );
+			add_image_size( $this->key, $this->w, $this->h, $this->crop );
 		}
 	}
 
