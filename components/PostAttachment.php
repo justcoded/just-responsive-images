@@ -3,6 +3,7 @@
 namespace jri\components;
 
 use jri\models\RwdSet;
+use jri\models\ImageSize;
 
 /**
  * Patch standard <img> "srcset" attribute generation
@@ -220,6 +221,26 @@ class PostAttachment {
 	 * @return mixed
 	 */
 	public function unify_wp_image_sizes( $image_sizes ) {
+		global $rwd_image_options, $_wp_additional_image_sizes;
+		foreach( $rwd_image_options as $subkey => $option ) {
+			$_wp_additional_image_sizes[ $subkey ] = array(
+				'width'  => $option->size->w,
+				'height' => $option->size->h,
+				'crop'   => is_array( $option->size->crop ) ? $option->size->crop : absint( $option->size->crop ),
+			);
+			$image_sizes[] = $subkey;
+			if ( $option->retina_options ) {
+				foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+					$retina_key = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+					$_wp_additional_image_sizes[ $retina_key ] = array(
+						'width'  => $option->size->w * $multiplier,
+						'height' => $option->size->h * $multiplier,
+						'crop'   => is_array( $option->size->crop ) ? $option->size->crop : absint( $option->size->crop ),
+					);
+					$image_sizes[] = $retina_key;
+				}
+			}
+		}
 		$image_sizes = array_unique( $image_sizes );
 		return $image_sizes;
 	}
