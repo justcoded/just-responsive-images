@@ -3,6 +3,7 @@
 namespace jri\components;
 
 use jri\models\RwdSet;
+use jri\models\ImageSize;
 
 /**
  * Patch standard <img> "srcset" attribute generation
@@ -35,7 +36,7 @@ class PostAttachment {
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_calculated_image_size_cache' ), 10, 4 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'calculate_image_srcset' ), 10, 5 );
 		add_filter( 'wp_calculate_image_sizes', array( $this, 'calculate_image_sizes' ), 10, 5 );
-		add_filter( 'intermediate_image_sizes', array( $this, 'unify_wp_image_sizes' ) );
+		add_filter( 'jio_settings_image_sizes', array( $this, 'add_jio_image_sizes' ) );
 	}
 
 	/**
@@ -219,8 +220,29 @@ class PostAttachment {
 	 *
 	 * @return mixed
 	 */
-	public function unify_wp_image_sizes( $image_sizes ) {
-		$image_sizes = array_unique( $image_sizes );
+	public function add_jio_image_sizes( $image_sizes ) {
+		global $rwd_image_options;
+		foreach ( $rwd_image_options as $subkey => $option ) {
+
+			$image_sizes[ $subkey ] = array(
+				'width'  => $option->size->w,
+				'height' => $option->size->h,
+				'crop'   => $option->size->crop,
+			);
+
+			if ( $option->retina_options ) {
+				foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+					$retina_key = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+
+					$image_sizes[ $retina_key ] = array(
+						'width'  => $option->size->w * $multiplier,
+						'height' => $option->size->h * $multiplier,
+						'crop'   => $option->size->crop,
+					);
+				}
+			}
+		}
+
 		return $image_sizes;
 	}
 

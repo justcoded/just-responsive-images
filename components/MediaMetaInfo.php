@@ -41,7 +41,7 @@ class MediaMetaInfo extends Controller {
 	 */
 	public function render_meta_info( $post ) {
 		$meta = wp_get_attachment_metadata( $post->ID );
-
+		
 		if ( ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
 			$meta['gcd']     = jri_greatest_commod_divisor( $meta['width'], $meta['height'] );
 			$meta['x_ratio'] = (int) $meta['width'] / $meta['gcd'];

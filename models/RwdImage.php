@@ -67,6 +67,12 @@ class RwdImage {
 	 */
 	protected $eol = "\n";
 
+	/**
+	 * JIO Attachment status in queue
+	 *
+	 * @var int
+	 */
+	const STATUS_IN_QUEUE = 1;
 
 	/**
 	 * RwdImage constructor.
@@ -556,6 +562,8 @@ class RwdImage {
 				$this->set_attachment_metadata( $attach_id, $meta_data );
 				// update metadata.
 				wp_update_attachment_metadata( $attach_id, $meta_data );
+				// update JIO attachment status
+				update_post_meta( $attach_id, '_just_img_opt_status', self::STATUS_IN_QUEUE );
 			}
 		}
 
