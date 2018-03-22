@@ -33,7 +33,7 @@ class PostAttachment {
 	 * Add hooks which patch wordpress <img> srcset and sizes attributes.
 	 */
 	public function add_image_responsive_hooks() {
-                add_filter( 'the_content', array( $this, 'make_content_images_responsive' ) );
+		add_filter( 'the_content', array( $this, 'make_content_images_responsive' ) );
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_calculated_image_size_cache' ), 10, 4 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'calculate_image_srcset' ), 10, 5 );
 		add_filter( 'wp_calculate_image_sizes', array( $this, 'calculate_image_sizes' ), 10, 5 );
@@ -72,10 +72,10 @@ class PostAttachment {
 	/**
 	 * Set image size
 	 *
-	 * @param string  $image image source.
+	 * @param string  $image         image source.
 	 * @param int     $attachment_id media attachment ID.
-	 * @param mixed   $size size details.
-	 * @param boolean $icon not used.
+	 * @param mixed   $size          size details.
+	 * @param boolean $icon          not used.
 	 *
 	 * @return string
 	 */
@@ -85,63 +85,64 @@ class PostAttachment {
 		return $image;
 	}
 
-        /**
-        * Filters 'img' elements in post content to add 'srcset' and 'sizes' attributes.
-        *
-        * @since 4.4.0
-        *
-        * @see wp_image_add_srcset_and_sizes()
-        *
-        * @param string $content The raw post content to be filtered.
-        * @return string Converted content with 'srcset' and 'sizes' attributes added to images.
-        */
-        public function make_content_images_responsive( $content ) {
-            if ( ! preg_match_all( '/<img [^>]+>/', $content, $matches ) ) {
+	/**
+	 * Filters 'img' elements in post content to add 'srcset' and 'sizes' attributes.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @see   wp_image_add_srcset_and_sizes()
+	 *
+	 * @param string $content The raw post content to be filtered.
+	 *
+	 * @return string Converted content with 'srcset' and 'sizes' attributes added to images.
+	 */
+	public function make_content_images_responsive( $content ) {
+		if ( ! preg_match_all( '/<img [^>]+>/', $content, $matches ) ) {
+			return $content;
+		}
+
+		$selected_images = $attachment_ids = array();
+
+		foreach ( $matches[0] as $image ) {
+			if ( false === strpos( $image, ' srcset=' ) && preg_match( '/wp-image-([0-9]+)/i', $image, $class_id ) &&
+			     ( $attachment_id = absint( $class_id[1] ) ) ) {
+
+				/*
+				 * If exactly the same image tag is used more than once, overwrite it.
+				 * All identical tags will be replaced later with 'str_replace()'.
+				 */
+				$selected_images[ $image ] = $attachment_id;
+				// Overwrite the ID when the same image is included more than once.
+				$attachment_ids[ $attachment_id ] = true;
+			}
+		}
+
+		if ( count( $attachment_ids ) > 1 ) {
+			/*
+			 * Warm the object cache with post and meta information for all found
+			 * images to avoid making individual database calls.
+			 */
+			_prime_post_caches( array_keys( $attachment_ids ), false, true );
+		}
+
+		foreach ( $selected_images as $image => $attachment_id ) {
+			if ( preg_match( '/size-([a-z]+)/i', $image, $size ) && has_image_size( $size[1] ) ) {
+				$content = str_replace( $image, get_rwd_attachment_image( $attachment_id, $size[1], 'img' ), $content );
+			} else {
+				$image_meta = wp_get_attachment_metadata( $attachment_id );
+				$content    = str_replace( $image, wp_image_add_srcset_and_sizes( $image, $image_meta, $attachment_id ), $content );
+			}
+		}
+
 		return $content;
-            }
-
-            $selected_images = $attachment_ids = array();
-
-            foreach( $matches[0] as $image ) {
-                    if ( false === strpos( $image, ' srcset=' ) && preg_match( '/wp-image-([0-9]+)/i', $image, $class_id ) &&
-                            ( $attachment_id = absint( $class_id[1] ) ) ) {
-
-                            /*
-                             * If exactly the same image tag is used more than once, overwrite it.
-                             * All identical tags will be replaced later with 'str_replace()'.
-                             */
-                            $selected_images[ $image ] = $attachment_id;
-                            // Overwrite the ID when the same image is included more than once.
-                            $attachment_ids[ $attachment_id ] = true;
-                    }
-            }
-
-            if ( count( $attachment_ids ) > 1 ) {
-                    /*
-                     * Warm the object cache with post and meta information for all found
-                     * images to avoid making individual database calls.
-                     */
-                    _prime_post_caches( array_keys( $attachment_ids ), false, true );
-            }
-
-            foreach ( $selected_images as $image => $attachment_id ) {
-                if( preg_match( '/size-([a-z]+)/i', $image, $size ) && has_image_size( $size[1] ) ) {
-                    $content = str_replace( $image, get_rwd_attachment_image( $attachment_id, $size[1], 'img' ), $content );
-                } else { 
-                    $image_meta = wp_get_attachment_metadata( $attachment_id );
-                    $content = str_replace( $image, wp_image_add_srcset_and_sizes( $image, $image_meta, $attachment_id ), $content );  
-                }
-            }
-
-            return $content;
-        }
+	}
 
 	/**
 	 * Calculate image sizes for srcset
 	 *
-	 * @param array  $sources Image file pathes grouped by image width dimention.
+	 * @param array  $sources    Image file pathes grouped by image width dimention.
 	 * @param array  $size_array Image widthes, which are lower than image, which should be displayed.
-	 * @param string $image_src Image src of resized image of "last_image_size_called" size.
+	 * @param string $image_src  Image src of resized image of "last_image_size_called" size.
 	 * @param array  $image_meta Image information with final dimension for each registered image size.
 	 * @param int    $attachment Attachment ID.
 	 *
@@ -191,10 +192,10 @@ class PostAttachment {
 	/**
 	 * Calculate image sizes
 	 *
-	 * @param array  $sizes Img sizes attribute, generated by WP.
-	 * @param mixed  $size_array Some width and height, not sure how it's used.
-	 * @param string $image_src Resized image original source.
-	 * @param array  $image_meta Image information with final dimension for each registered image size.
+	 * @param array  $sizes         Img sizes attribute, generated by WP.
+	 * @param mixed  $size_array    Some width and height, not sure how it's used.
+	 * @param string $image_src     Resized image original source.
+	 * @param array  $image_meta    Image information with final dimension for each registered image size.
 	 * @param int    $attachment_id Attachment ID.
 	 *
 	 * @return array
@@ -240,9 +241,9 @@ class PostAttachment {
 	/**
 	 * Clean up <img> "src" attribute at all if we generate correct srcset and sizes attributes.
 	 *
-	 * @param array        $attr Attributes for the image markup.
+	 * @param array        $attr       Attributes for the image markup.
 	 * @param WP_Post      $attachment Image attachment post.
-	 * @param string|array $size Requested size. Image size or array of width and height values
+	 * @param string|array $size       Requested size. Image size or array of width and height values
 	 *                                 (in that order). Default 'thumbnail'.
 	 *
 	 * @return mixed
@@ -268,7 +269,7 @@ class PostAttachment {
 	 * WordPress by default add keys like thumbnail, medium, etc.
 	 * To speed up loop of regeneration we need to remove duplicated keys.
 	 *
-	 * @param array $image_sizes  Image size names array.
+	 * @param array $image_sizes Image size names array.
 	 *
 	 * @return mixed
 	 */

@@ -5,7 +5,7 @@ Description: Providing full control to set your own responsive image properties 
 Tags: responsive post thumbnail, post thumbnail as background, retina support, retina image, retina post thumbnail, responsive post attachment, responsive images, responsive attachments, post thumbnails, media
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
-Requires at least: 4.4
+Requires at least: 4.5
 Tested up to: 4.9.4
 Requires PHP: >=5.6
 License: GPL3
