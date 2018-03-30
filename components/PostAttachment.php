@@ -135,6 +135,9 @@ class PostAttachment {
 		foreach ( $selected_images as $image => $attachment_id ) {
 			if ( preg_match( '/size-([a-z]+)/i', $image, $size ) && has_image_size( $size[1] ) ) {
 				$content = str_replace( $image, get_rwd_attachment_image( $attachment_id, $size[1], 'img' ), $content );
+			} else {
+				$image_meta = wp_get_attachment_metadata( $attachment_id );
+				$content    = str_replace( $image, wp_image_add_srcset_and_sizes( $image, $image_meta, $attachment_id ), $content );
 			}
 		}
 
