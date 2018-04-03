@@ -5,7 +5,7 @@ Description: Providing full control to set your own responsive image properties 
 Tags: responsive post thumbnail, post thumbnail as background, retina support, retina image, retina post thumbnail, responsive post attachment, responsive images, responsive attachments, post thumbnails, media
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
-Requires at least: 4.4
+Requires at least: 4.5
 Tested up to: 4.9.4
 Requires PHP: >=5.6
 License: GPL3
@@ -82,6 +82,9 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.5.1 - 3 April 2018 =
+    * Added compatibility with Crop Images plugin
+    * Fix main editor content responsive images (it was broken after some WP update)
 = Version 1.5 - 15 March 2018 =
     * Added compatibility with Just Image Optimizer plugin
 = Version 1.4.1 - 9 March 2018 =
