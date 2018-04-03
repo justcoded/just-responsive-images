@@ -30,20 +30,29 @@ class PostAttachment {
 	}
 
 	/**
-	 * Add hooks which patch wordpress <img> srcset and sizes attributes.
+	 * Add hooks which patch WordPress <img> srcset and sizes attributes.
 	 */
 	public function add_image_responsive_hooks() {
+		// Starting from WordPress 4.6 or 4.7 it change the way main content responsive images works.
+		// We remove standard filter and replace it with our filter.
 		remove_filter( 'the_content', 'wp_make_content_images_responsive' );
 		add_filter( 'the_content', array( $this, 'make_content_images_responsive' ) );
+
+		// hooks to make responsive usual WordPress thumbnail functions.
+		// Probably doesn't work for WordPress 4.7+ or 4.8+.
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'set_calculated_image_size_cache' ), 10, 4 );
 		add_filter( 'wp_calculate_image_srcset', array( $this, 'calculate_image_srcset' ), 10, 5 );
 		add_filter( 'wp_calculate_image_sizes', array( $this, 'calculate_image_sizes' ), 10, 5 );
+
+		// patch image sizes list for "Just Image Optimizer" to show all available image sizes.
 		add_filter( 'jio_settings_image_sizes', array( $this, 'add_jio_image_sizes' ) );
-		// Add filters for Crop Images Plugins
+
+		// Add filters for compatibility with manual "Crop Images" Plugins.
 		if ( isset( $_GET['action'] )
-		     && ( $_GET['action'] === 'pte_ajax' || $_GET['action'] === 'mic_editor_window' ) ) {
-			add_filter( 'intermediate_image_sizes', array( $this, 'add_crop_image_sizes' ) );
-			add_filter( 'wp_update_attachment_metadata', array( $this, 'update_attachment_metadata' ), 10, 2 );
+		     && ( $_GET['action'] === 'pte_ajax' || $_GET['action'] === 'mic_editor_window' )
+		) {
+			add_filter( 'intermediate_image_sizes', array( $this, 'force_register_rwd_image_sizes' ) );
+			add_filter( 'wp_update_attachment_metadata', array( $this, 'update_attachment_rwd_metadata' ), 10, 2 );
 		}
 	}
 
@@ -111,10 +120,11 @@ class PostAttachment {
 		$selected_images = $attachment_ids = array();
 
 		foreach ( $matches[0] as $image ) {
-			if ( false === strpos( $image, ' srcset=' ) && preg_match( '/wp-image-([0-9]+)/i', $image, $class_id ) &&
-			     ( $attachment_id = absint( $class_id[1] ) ) ) {
-
-				/*
+			if ( false === strpos( $image, ' srcset=' )
+				&& preg_match( '/wp-image-([0-9]+)/i', $image, $class_id )
+				&& ( $attachment_id = absint( $class_id[1] ) )
+			) {
+				/**
 				 * If exactly the same image tag is used more than once, overwrite it.
 				 * All identical tags will be replaced later with 'str_replace()'.
 				 */
@@ -134,6 +144,7 @@ class PostAttachment {
 
 		foreach ( $selected_images as $image => $attachment_id ) {
 			if ( preg_match( '/size-([a-z]+)/i', $image, $size ) && has_image_size( $size[1] ) ) {
+				// TODO: check that alt is stay the same as it was in content.
 				$content = str_replace( $image, get_rwd_attachment_image( $attachment_id, $size[1], 'img' ), $content );
 			} else {
 				$image_meta = wp_get_attachment_metadata( $attachment_id );
@@ -159,9 +170,9 @@ class PostAttachment {
 		/* @var $rwd_image_sizes RwdSet[] */
 		global $rwd_image_sizes;
 		if ( empty( $this->calculated_image_size )
-		     || is_array( $this->calculated_image_size )
-		     || ! array_key_exists( $this->calculated_image_size, $image_meta['sizes'] )
-		     || empty( $rwd_image_sizes[ $this->calculated_image_size ]->options )
+			|| is_array( $this->calculated_image_size )
+			|| ! array_key_exists( $this->calculated_image_size, $image_meta['sizes'] )
+			|| empty( $rwd_image_sizes[ $this->calculated_image_size ]->options )
 		) {
 			return $sources;
 		}
@@ -211,8 +222,8 @@ class PostAttachment {
 		/* @var $rwd_image_sizes RwdSet[] */
 		global $rwd_image_sizes;
 		if ( empty( $this->calculated_image_size )
-		     || is_array( $this->calculated_image_size )
-		     || empty( $rwd_image_sizes[ $this->calculated_image_size ]->options )
+			|| is_array( $this->calculated_image_size )
+			|| empty( $rwd_image_sizes[ $this->calculated_image_size ]->options )
 		) {
 			return $sizes;
 		}
@@ -258,8 +269,8 @@ class PostAttachment {
 	public function attachment_image_attributes( $attr, $attachment, $size ) {
 		global $rwd_image_sizes;
 		if ( empty( $size )
-		     || is_array( $size )
-		     || empty( $rwd_image_sizes[ $size ] )
+			|| is_array( $size )
+			|| empty( $rwd_image_sizes[ $size ] )
 		) {
 			return $attr;
 		}
@@ -314,11 +325,12 @@ class PostAttachment {
 	 *
 	 * @return array
 	 */
-	public function add_crop_image_sizes( $image_sizes ) {
-		global $rwd_image_options;
+	public function force_register_rwd_image_sizes( $image_sizes ) {
+		global $rwd_image_options, $_wp_additional_image_sizes;
 		foreach ( $rwd_image_options as $subkey => $option ) {
-			$image_sizes[]                                    = $subkey;
-			$GLOBALS['_wp_additional_image_sizes'][ $subkey ] = array(
+			$image_sizes[] = $subkey;
+
+			$_wp_additional_image_sizes[ $subkey ] = array(
 				'width'  => $option->size->w,
 				'height' => $option->size->h,
 				'crop'   => $option->size->crop,
@@ -328,7 +340,8 @@ class PostAttachment {
 				foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 					$retina_key    = ImageSize::get_retina_key( $option->key, $retina_descriptor );
 					$image_sizes[] = $retina_key;
-					$GLOBALS['_wp_additional_image_sizes'][ $retina_key ] = array(
+
+					$_wp_additional_image_sizes[ $retina_key ] = array(
 						'width'  => $option->size->w * $multiplier,
 						'height' => $option->size->h * $multiplier,
 						'crop'   => $option->size->crop,
@@ -349,7 +362,7 @@ class PostAttachment {
 	 *
 	 * @return array
 	 */
-	public function update_attachment_metadata( $data, $attachment_id ) {
+	public function update_attachment_rwd_metadata( $data, $attachment_id ) {
 		$current_metadata = wp_get_attachment_metadata( $attachment_id );
 		if ( empty( $current_metadata ) ) {
 			return $data;
