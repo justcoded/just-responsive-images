@@ -99,9 +99,32 @@ class RwdImage {
 	}
 
 	/**
+	 * Generate generate fake src for empty image sizes
+	 *
+	 * @param object $options empty image size options.
+	 * @param bool   $retina for retina image
+	 *
+	 * @return string
+	 */
+	public function dummy_src( $options, $retina = false ) {
+		$sizename = $options->key;
+
+		$color     = substr( md5( $sizename, false ), 0, 6 );
+		$textcolor = '000000';
+		if ( $options->size->h == 9999 ) {
+			$size      = ( $retina ) ? $options->size->w * 2 : $options->size->w;
+			$textcolor = 'ff0000';
+		} else {
+			$size = ( $retina ) ? $options->size->w * 2 : $options->size->w . 'x' . ( $retina ) ? $options->size->h * 2 : $options->size->h;
+		}
+
+		return "http://via.placeholder.com/{$size}/$color/$textcolor";
+	}
+
+	/**
 	 * Generate <picture> tag for the current attachment with specified size
 	 *
-	 * @param string|array $size       Required image size.
+	 * @param string|array $size Required image size.
 	 * @param array        $attributes Additional html attributes to be used for main tag.
 	 *
 	 * @return string
@@ -148,19 +171,30 @@ class RwdImage {
 
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->picture ) ) {
-					continue;
-				}
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE ) {
+						$src = $this->dummy_src( $option );
+					} else {
+						continue;
+					}
+				} else {
+					$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+					$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
 
-				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
-				$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
-
-				$src = array( $baseurl . $sources[ $subkey ]['file'] );
-				// get retina sources.
-				if ( $option->retina_options ) {
-					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
-						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
-							$src[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_descriptor;
+					$src = array( $baseurl . $sources[ $subkey ]['file'] );
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $sources[ $subkey ]['file'] ) ) {
+						$src = array( $this->dummy_src( $option ) );
+					}
+					// get retina sources.
+					if ( $option->retina_options ) {
+						foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+							$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+							if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
+								if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
+									$src[] = $this->dummy_src( $option, true ) . ' ' . $retina_descriptor;
+								} else {
+									$src[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_descriptor;
+								}
+							}
 						}
 					}
 				}
@@ -172,7 +206,7 @@ class RwdImage {
 				);
 
 				$template = $option->picture ? $option->picture : $default_template;
-				$html .= strtr( $template, $tokens ) . $this->eol;
+				$html     .= strtr( $template, $tokens ) . $this->eol;
 			}
 			$html .= '</picture>';
 		} // End if().
@@ -185,7 +219,7 @@ class RwdImage {
 	/**
 	 * Generate <img> tag for the current attachment with specified size
 	 *
-	 * @param string|array $size       Required image size.
+	 * @param string|array $size Required image size.
 	 * @param array        $attributes Additional html attributes to be used for main tag.
 	 *
 	 * @return string
@@ -218,24 +252,38 @@ class RwdImage {
 			// generation of responsive sizes.
 			foreach ( $this->rwd_set->options as $subkey => $option ) {
 				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
-					continue;
-				}
-				$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
-				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE ) {
+						$src = $this->dummy_src( $option );
+					} else {
+						continue;
+					}
+				} else {
+					$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
+					$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
-				$tokens = array(
-					'{src}' => esc_attr( $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'] ),
-					'{w}'   => $meta_data['sizes'][ $option->key ]['width'],
-				);
-				// get retina sources.
-				if ( $option->retina_options ) {
-					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
-						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-						if ( ! empty( $meta_data['sizes'][ $retina_image_size ]['width'] ) ) {
-							$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
-							$srcset[]     = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
+					$tokens = array(
+						'{src}' => esc_attr( $baseurl . $sources[ $subkey ]['file'] ),
+						'{w}'   => $meta_data['sizes'][ $option->key ]['width'],
+					);
+
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $sources[ $subkey ]['file'] ) ) {
+						$tokens['{src}'] = $this->dummy_src( $option );
+					}
+					// get retina sources.
+					if ( $option->retina_options ) {
+						foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+							$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+							if ( ! empty( $meta_data['sizes'][ $retina_image_size ]['width'] ) ) {
+								$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
+								if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
+									$srcset[] = $this->dummy_src( $option, true ) . ' ' . $retina_width . 'w';
+								} else {
+									$srcset[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
+								}
+							}
 						}
 					}
+
 				}
 				$src      = $tokens['{src}'];
 				$srcset[] = strtr( "{src} $option->srcset", $tokens );
@@ -269,7 +317,7 @@ class RwdImage {
 	 * Generate background media queries
 	 *
 	 * @param string       $selector CSS selector.
-	 * @param string|array $size     Required image size.
+	 * @param string|array $size Required image size.
 	 *
 	 * @return string Generated html comments warnings.
 	 */
@@ -288,42 +336,57 @@ class RwdImage {
 			}
 			// generation of responsive sizes.
 			foreach ( $rwd_options as $subkey => $option ) {
-				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->bg ) ) {
-					continue;
-				}
-				$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
-				$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
-
-				$src   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] ) . $sources[ $subkey ]['file'];
-				$media = str_replace( '{w}', $meta_data['sizes'][ $option->key ]['width'], $option->bg );
-
-				if ( ! isset( $rwd_background_styles[ $media ] ) ) {
-					$rwd_background_styles[ $media ] = array();
-				}
-				$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
-
-				// get retina sources.
-				if ( $option->retina_options ) {
-					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
-						// Check media pixel and media resolution dpi.
-						$media_pixel_ration = ( $multiplier < 2.5 ? 1.5 : 2.5 );
-						$media_resolution   = ( $multiplier < 2.5 ? '144dpi' : '192dpi' );
-
-						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-
-						if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
-							$src_retina   = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
-							$media_retina = strtr( $option->bg_retina, array(
-								'{dpr}'     => "(-webkit-min-device-pixel-ratio:{$media_pixel_ration})",
-								'{min_res}' => "(min-resolution : {$media_resolution})",
-							) );
-							if ( ! isset( $rwd_background_styles[ $media_retina ] ) ) {
-								$rwd_background_styles[ $media_retina ] = array();
-							}
-							$rwd_background_styles[ $media_retina ][ $selector ] = "$selector{background-image:url('$src_retina');}";
-						}
+				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE ) {
+						$src = $this->dummy_src( $option );
+					} else {
+						continue;
 					}
-				} // End if().
+				} else {
+					$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
+					$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
+
+					if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $sources[ $subkey ]['file'] ) ) {
+						$src = $this->dummy_src( $option );
+					} else {
+						$src = $baseurl . $sources[ $subkey ]['file'];
+					}
+					$media = str_replace( '{w}', $meta_data['sizes'][ $option->key ]['width'], $option->bg );
+
+					if ( ! isset( $rwd_background_styles[ $media ] ) ) {
+						$rwd_background_styles[ $media ] = array();
+					}
+					$rwd_background_styles[ $media ][ $selector ] = "$selector{background-image:url('$src');}";
+
+					// get retina sources.
+					if ( $option->retina_options ) {
+						foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
+							// Check media pixel and media resolution dpi.
+							$media_pixel_ration = ( $multiplier < 2.5 ? 1.5 : 2.5 );
+							$media_resolution   = ( $multiplier < 2.5 ? '144dpi' : '192dpi' );
+
+							$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
+
+							if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
+
+								if ( defined( 'JRI_DUMMY_IMAGE' ) && JRI_DUMMY_IMAGE && ! file_exists( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
+									$src_retina = $this->dummy_src( $option, true );
+								} else {
+									$src_retina = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
+								}
+								$media_retina = strtr( $option->bg_retina, array(
+									'{dpr}'     => "(-webkit-min-device-pixel-ratio:{$media_pixel_ration})",
+									'{min_res}' => "(min-resolution : {$media_resolution})",
+								) );
+								if ( ! isset( $rwd_background_styles[ $media_retina ] ) ) {
+									$rwd_background_styles[ $media_retina ] = array();
+								}
+								$rwd_background_styles[ $media_retina ][ $selector ] = "$selector{background-image:url('$src_retina');}";
+							}
+						}
+					} // End if().
+
+				}
 			} // End foreach().
 		} // End if().
 
@@ -333,7 +396,7 @@ class RwdImage {
 	/**
 	 * Generate img tag for svg image
 	 *
-	 * @param string|array $size       Required image size.
+	 * @param string|array $size Required image size.
 	 * @param array        $attributes Image attributes.
 	 *
 	 * @return string Generated html comments warnings.
@@ -495,10 +558,10 @@ class RwdImage {
 	 *
 	 * @param int    $attach_id Attachment ID.
 	 * @param array  $meta_data Attachment meta data.
-	 * @param string $key       Image size key.
-	 * @param int    $width     Image width.
-	 * @param int    $height    Image height.
-	 * @param int    $crop      Crop image.
+	 * @param string $key Image size key.
+	 * @param int    $width Image width.
+	 * @param int    $height Image height.
+	 * @param int    $crop Crop image.
 	 *
 	 * @return array
 	 */
@@ -509,8 +572,8 @@ class RwdImage {
 		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
 
 		if ( ! file_exists( $image_baseurl ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] )
-			|| $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
-			|| ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
+		     || $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
+		     || ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
 		) {
 			// Get WP Image Editor Instance.
 			$image_path   = get_attached_file( $attach_id );
@@ -528,8 +591,8 @@ class RwdImage {
 				// We taked resized image only if we sure that resize was successful and resized dimensions are correct.
 				// - if original image is bigger than resized copy - resize was successful.
 				if ( ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] )
-					// - if crop enabled and resized image match the requested size - resize was successful.
-					|| ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
+				     // - if crop enabled and resized image match the requested size - resize was successful.
+				     || ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
 				) {
 					// WP Image Editor save image.
 					$image_editor->save();
@@ -630,7 +693,7 @@ class RwdImage {
 	 * Set updated values to cache
 	 *
 	 * @param int   $attachment_id Attachment post to update it's metadata cache.
-	 * @param array $meta_data     New meta data values.
+	 * @param array $meta_data New meta data values.
 	 */
 	protected function set_attachment_metadata( $attachment_id, $meta_data ) {
 		static::$meta_datas[ $attachment_id ] = $meta_data;
