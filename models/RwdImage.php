@@ -530,7 +530,6 @@ class RwdImage {
 							}
 						}
 					}
-					//var_dump($option->retina_options, $option->key,ImageSize::get_retina_key( $option->key, $retina_descriptor ),$meta_data); die;
 				}
 			}
 
