@@ -101,27 +101,6 @@ class RwdImage {
 		}
 	}
 
-	/**
-	 * Generate generate fake src for empty image sizes
-	 *
-	 * @param object $options empty image size options.
-	 * @param bool   $retina for retina image
-	 *
-	 * @return string
-	 */
-	public function dummy_src( $options, $retina = false ) {
-		$sizename = $options->key;
-
-		if ( $options->size->h == 9999 ) {
-			$size      = ( $retina ) ? ($options->size->w * 2).'x'.($options->size->w * 2) : $options->size->w.'x'.$options->size->w;
-		} elseif ( $options->size->w == 9999 ) {
-			$size      = ( $retina ) ? ($options->size->h * 2).'x'.($options->size->h * 2) : $options->size->h.'x'.$options->size->h;
-		} else {
-			$size = ( $retina ) ? $options->size->w * 2 : $options->size->w . 'x' . ( $retina ) ? $options->size->h * 2 : $options->size->h;
-		}
-
-		return $sizename.'-'.$size.'.png';
-	}
 
 	/**
 	 * Generate <picture> tag for the current attachment with specified size
@@ -267,7 +246,7 @@ class RwdImage {
 							$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
 							if ( ! empty( $meta_data['sizes'][ $retina_image_size ]['width'] ) ) {
 								$retina_width = $meta_data['sizes'][ $retina_image_size ]['width'];
-								$srcset[] = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
+								$srcset[]     = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'] . ' ' . $retina_width . 'w';
 							}
 						}
 					}
@@ -334,7 +313,7 @@ class RwdImage {
 					$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
 					$meta_data = $this->get_attachment_metadata( $sources[ $subkey ]['attachment_id'] );
 
-					$src = $baseurl . $sources[ $subkey ]['file'];
+					$src   = $baseurl . $sources[ $subkey ]['file'];
 					$media = str_replace( '{w}', $meta_data['sizes'][ $option->key ]['width'], $option->bg );
 
 					if ( ! isset( $rwd_background_styles[ $media ] ) ) {
@@ -352,7 +331,7 @@ class RwdImage {
 							$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
 
 							if ( ! empty( $meta_data['sizes'][ $retina_image_size ] ) ) {
-								$src_retina = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
+								$src_retina   = $baseurl . $meta_data['sizes'][ $retina_image_size ]['file'];
 								$media_retina = strtr( $option->bg_retina, array(
 									'{dpr}'     => "(-webkit-min-device-pixel-ratio:{$media_pixel_ration})",
 									'{min_res}' => "(min-resolution : {$media_resolution})",
@@ -457,7 +436,6 @@ class RwdImage {
 		if ( empty( $this->rwd_set ) ) {
 			return null;
 		}
-
 		$sources           = array();
 		$attachment_meta   = $this->get_attachment_metadata( $this->attachment->ID );
 		$is_attachment_svg = $this->verify_svg_mime_type( $this->attachment );
@@ -509,7 +487,7 @@ class RwdImage {
 				if ( $option->retina_options ) {
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-						$meta_data = $this->resize_image(
+						$meta_data         = $this->resize_image(
 							$attachment->ID,
 							$meta_data,
 							$retina_image_size,
@@ -518,16 +496,8 @@ class RwdImage {
 							$option->size->crop
 						);
 
-						if( JRI_DUMMY_IMAGE ){
-							$dirname = _wp_get_attachment_relative_path( $meta_data['file'] );
-							if ( $dirname ) {
-								$dirname = trailingslashit( $dirname );
-							}
-							$upload_dir    = wp_get_upload_dir();
-							$image_basedir = trailingslashit( $upload_dir['basedir'] ) . $dirname;
-							if(!file_exists($image_basedir.$meta_data['sizes'][ $retina_image_size ]['file'])){
-								$meta_data['sizes'][ $retina_image_size ]['file'] = $this->dummy_src($option, true );
-							}
+						if ( JRI_DUMMY_IMAGE ) {
+							$meta_data['sizes'][ $retina_image_size ]['file'] = $this->dummy_src( $option, true, $meta_data );
 						}
 					}
 				}
@@ -539,16 +509,8 @@ class RwdImage {
 				continue;
 			}
 
-			if( JRI_DUMMY_IMAGE ){
-				$dirname = _wp_get_attachment_relative_path( $meta_data['file'] );
-				if ( $dirname ) {
-					$dirname = trailingslashit( $dirname );
-				}
-				$upload_dir    = wp_get_upload_dir();
-				$image_basedir = trailingslashit( $upload_dir['basedir'] ) . $dirname;
-				if(!file_exists($image_basedir.$meta_data['sizes'][ $option->key ]['file'])){
-					$meta_data['sizes'][ $option->key ]['file'] = $this->dummy_src($option);
-				}
+			if ( JRI_DUMMY_IMAGE ) {
+				$meta_data['sizes'][ $option->key ]['file'] = $this->dummy_src( $option, false, $meta_data );
 			}
 
 			$sources[ $subkey ]                  = $meta_data['sizes'][ $option->key ];
@@ -556,6 +518,44 @@ class RwdImage {
 		} // End foreach().
 
 		return $sources;
+	}
+
+	/**
+	 * Generate generate fake src for empty image sizes
+	 *
+	 * @param object $options empty image size options.
+	 * @param bool   $retina for retina image
+	 *
+	 * @return string
+	 */
+	public function dummy_src( $options, $retina = false, $meta_data = false ) {
+
+		$sizename = $options->key;
+
+		if ( $options->size->h == 9999 ) {
+			$size = ( $retina ) ? ( $options->size->w * 2 ) . 'x' . ( $options->size->w * 2 ) : $options->size->w . 'x' . $options->size->w;
+		} elseif ( $options->size->w == 9999 ) {
+			$size = ( $retina ) ? ( $options->size->h * 2 ) . 'x' . ( $options->size->h * 2 ) : $options->size->h . 'x' . $options->size->h;
+		} else {
+			$size = ( $retina ) ? $options->size->w * 2 : $options->size->w . 'x' . ( $retina ) ? $options->size->h * 2 : $options->size->h;
+		}
+
+		if ( $meta_data ) {
+			$dirname = _wp_get_attachment_relative_path( $meta_data['file'] );
+			if ( $dirname ) {
+				$dirname = trailingslashit( $dirname );
+			}
+			$upload_dir    = wp_get_upload_dir();
+			$image_basedir = trailingslashit( $upload_dir['basedir'] ) . $dirname;
+			if ( ! file_exists( $image_basedir . $meta_data['sizes'][ $sizename ]['file'] ) ) {
+				return $sizename . '-' . $size . '.png';
+			} else {
+				return $meta_data['sizes'][ $sizename ]['file'];
+			}
+		} else {
+			return $sizename . '-' . $size . '.png';
+		}
+
 	}
 
 	/**
@@ -577,8 +577,8 @@ class RwdImage {
 		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
 
 		if ( ! file_exists( $image_baseurl ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] )
-		     || $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
-		     || ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
+			 || $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
+			 || ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
 		) {
 			// Get WP Image Editor Instance.
 			$image_path   = get_attached_file( $attach_id );
@@ -596,8 +596,8 @@ class RwdImage {
 				// We taked resized image only if we sure that resize was successful and resized dimensions are correct.
 				// - if original image is bigger than resized copy - resize was successful.
 				if ( ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] )
-				     // - if crop enabled and resized image match the requested size - resize was successful.
-				     || ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
+					 // - if crop enabled and resized image match the requested size - resize was successful.
+					 || ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
 				) {
 					// WP Image Editor save image.
 					$image_editor->save();
