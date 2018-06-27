@@ -489,7 +489,7 @@ class RwdImage {
 							$option->size->crop
 						);
 
-						if ( JRI_DUMMY_IMAGE && empty( $dummy_sizes[ $retina_image_size ]['file'] ) ) {
+						if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
 							$dummy_sizes[ $retina_image_size ] = $this->dummy_source( $option, $multiplier, $meta_data );
 						}
 					}
@@ -514,7 +514,7 @@ class RwdImage {
 			$sources[ $subkey ]['attachment_id'] = $attachment->ID;
 		} // End foreach().
 
-		// cache all dummy retina sizes.
+		// cache all dummy retina sizes to get correct width/height options for retina.
 		if ( JRI_DUMMY_IMAGE ) {
 			foreach ( $dummy_meta as $attachment_id => $meta_data ) {
 				$this->set_attachment_metadata( $attachment_id, $meta_data );
