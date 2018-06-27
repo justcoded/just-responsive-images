@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, post thumbnail as background, retina support, r
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.5
-Tested up to: 4.9.4
+Tested up to: 4.9.6
 Requires PHP: >=5.6
 License: GPL3
 Stable tag: trunk
@@ -39,6 +39,14 @@ Our plugin resize images ONLY when you open the page with an image, printed with
 
 In version 1.2 default RWD set background options updated to mobile-first strategy (from desktop-first).
 If you use nested rules from RWD set you should update your main size background option to have @media query with `min-width` rule.
+
+= DEV Mode =
+
+In DEV mode plugin does not resize any images and simply use placeholder images. This can be used to reduce disk space, while you develop and configure our plugin to match all required screen sizes.
+
+To enable it you need to define new constant in your wp-config.php file:
+
+`define( 'JRI_DUMMY_IMAGE', true );`
 
 == Installation ==
 
@@ -82,6 +90,8 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.6.0 - 27 June 2018 =
+    * Dev mode with placeholder images instead of real images in case correct sizes are missing. 
 = Version 1.5.1 - 3 April 2018 =
     * Added compatibility with Crop Images plugin
     * Fix main editor content responsive images (it was broken after some WP update)
