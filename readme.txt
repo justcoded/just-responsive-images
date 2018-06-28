@@ -90,6 +90,8 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.6.1 - 28 June 2018 =
+    * Added attachment ID text to dev mode dummy images. 
 = Version 1.6.0 - 27 June 2018 =
     * Dev mode with placeholder images instead of real images in case correct sizes are missing. 
 = Version 1.5.1 - 3 April 2018 =
