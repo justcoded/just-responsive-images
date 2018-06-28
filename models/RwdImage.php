@@ -473,7 +473,7 @@ class RwdImage {
 					$option->size->crop
 				);
 				if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $option->key ]['file'] ) ) {
-					$dummy_sizes[ $option->key ] = $this->dummy_source( $option, false, $meta_data );
+					$dummy_sizes[ $option->key ] = $this->dummy_source( $option, false, $attachment->ID, $meta_data );
 				}
 
 				// Resize retina images if not exists.
@@ -490,7 +490,7 @@ class RwdImage {
 						);
 
 						if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
-							$dummy_sizes[ $retina_image_size ] = $this->dummy_source( $option, $multiplier, $meta_data );
+							$dummy_sizes[ $retina_image_size ] = $this->dummy_source( $option, $multiplier, $attachment->ID, $meta_data );
 						}
 					}
 				}
@@ -529,11 +529,12 @@ class RwdImage {
 	 *
 	 * @param RwdOption $option empty image size options.
 	 * @param int|bool  $retina_multiplier retina multiplier for retina size.
+	 * @param int       $attachment_id attachment ID to get dummy image.
 	 * @param array     $meta_data image attachment WP metadata.
 	 *
 	 * @return string
 	 */
-	public function dummy_source( $option, $retina_multiplier = false, $meta_data = false ) {
+	public function dummy_source( $option, $retina_multiplier, $attachment_id, $meta_data ) {
 
 		$sizename = $option->key;
 
@@ -557,7 +558,7 @@ class RwdImage {
 		}
 
 		$color     = substr( md5( "{$meta_data['file']}-$w-$h" ), 0, 6 );
-		$dummy_url = "http://via.placeholder.com/{$w}x{$h}/$color";
+		$dummy_url = "http://via.placeholder.com/{$w}x{$h}/$color?text=%23{$attachment_id}:+{$w}x{$h}";
 
 		return [
 			'file'   => $dummy_url,
