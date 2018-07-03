@@ -472,7 +472,7 @@ class RwdImage {
 					$option->size->h,
 					$option->size->crop
 				);
-				if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $option->key ]['file'] ) ) {
+				if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $option->key ]['valid'] ) ) {
 					$dummy_sizes[ $option->key ] = $this->dummy_source( $option, false, $attachment->ID, $meta_data );
 				}
 
@@ -489,7 +489,7 @@ class RwdImage {
 							$option->size->crop
 						);
 
-						if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $retina_image_size ]['file'] ) ) {
+						if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $retina_image_size ]['valid'] ) ) {
 							$dummy_sizes[ $retina_image_size ] = $this->dummy_source( $option, $multiplier, $attachment->ID, $meta_data );
 						}
 					}
@@ -585,12 +585,15 @@ class RwdImage {
 		$upload_dir    = wp_get_upload_dir();
 		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
 
+		$meta_data['sizes'][ $key ]['valid'] = true;
+
 		if ( ! file_exists( $image_baseurl ) || ! isset( $meta_data['sizes'][ $key ]['rwd_width'] )
 			|| $meta_data['sizes'][ $key ]['rwd_width'] !== $width || $meta_data['sizes'][ $key ]['rwd_height'] !== $height
 			|| ( 0 !== strcmp( $crop_str, $meta_data['sizes'][ $key ]['crop'] ) )
 		) {
 			// in dummy mode we do not resize anything.
 			if ( JRI_DUMMY_IMAGE ) {
+				$meta_data['sizes'][ $key ]['valid'] = false;
 				return $meta_data;
 			}
 
