@@ -298,7 +298,7 @@ class RwdImage {
 			}
 			// generation of responsive sizes.
 			foreach ( $rwd_options as $subkey => $option ) {
-				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->srcset ) ) {
+				if ( ! isset( $sources[ $subkey ] ) || is_null( $option->bg ) ) {
 					continue;
 				}
 				$baseurl   = $this->get_attachment_baseurl( $sources[ $subkey ]['attachment_id'] );
