@@ -22,7 +22,7 @@ use jri\models\RwdImage;
  * @param array            $attr  Additional html attributes to be used for main tag.
  */
 function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $attr = array() ) {
-	if(empty($tag)) {
+	if( empty( $tag ) ) {
 		$tag = apply_filters( 'rwd_tag_type', 'picture' );
 	}
 	echo get_rwd_attachment_image( $attachment, $size, $tag, $attr );
@@ -46,6 +46,11 @@ function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $a
  */
 function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $attr = array() ) {
 	$rwd_image = new RwdImage( $attachment );
+
+	if( empty( $tag ) ) {
+		$tag = apply_filters( 'rwd_tag_type', 'picture' );
+	}
+
 	$size = apply_filters( 'post_thumbnail_size', $size );
 
 	if ( 'img' != $tag ) {
