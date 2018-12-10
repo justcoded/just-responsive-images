@@ -21,7 +21,7 @@ use jri\models\RwdImage;
  * @param string           $tag Specify which tag should be used: picture|img.
  * @param array            $attr  Additional html attributes to be used for main tag.
  */
-function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $attr = array() ) {
+function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = null, $attr = array() ) {
 	if( empty( $tag ) ) {
 		$tag = apply_filters( 'rwd_tag_type', 'picture' );
 	}
@@ -44,7 +44,7 @@ function rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $a
  *
  * @return string Generated html.
  */
-function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag, $attr = array() ) {
+function get_rwd_attachment_image( $attachment = null, $size = 'thumbnail', $tag = null, $attr = array() ) {
 	$rwd_image = new RwdImage( $attachment );
 
 	if( empty( $tag ) ) {
