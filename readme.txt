@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, post thumbnail as background, retina support, r
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.5
-Tested up to: 4.9.6
+Tested up to: 5.0.1
 Requires PHP: >=5.6
 License: GPL3
 Stable tag: trunk
