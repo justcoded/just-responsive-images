@@ -92,6 +92,7 @@ To upgrade remove the old plugin folder. After than follow the installation step
 == Changelog ==
 = Version 1.6.4 - 25 January 2018 =
     * Fixed always resize for retina if 2x is bigger than original image. 
+    * Add ability to set default tag for rwd_attachment_image() with a filter.
 = Version 1.6.3 - 9 August 2018 =
     * Fix background usage if no other options specified. 
 = Version 1.6.2 - 3 July 2018 =
