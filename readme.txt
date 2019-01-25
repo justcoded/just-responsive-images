@@ -6,7 +6,7 @@ Tags: responsive post thumbnail, post thumbnail as background, retina support, r
 Author: JustCoded / Alex Prokopenko
 Author URI: http://justcoded.com/
 Requires at least: 4.5
-Tested up to: 4.9.8
+Tested up to: 5.0.3
 Requires PHP: >=5.6
 License: GPL3
 Stable tag: trunk
@@ -90,6 +90,8 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
+= Version 1.6.4 - 25 January 2018 =
+    * Fixed always resize for retina if 2x is bigger than original image. 
 = Version 1.6.3 - 9 August 2018 =
     * Fix background usage if no other options specified. 
 = Version 1.6.2 - 3 July 2018 =

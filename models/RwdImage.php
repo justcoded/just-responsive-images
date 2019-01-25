@@ -480,14 +480,19 @@ class RwdImage {
 				if ( $option->retina_options ) {
 					foreach ( $option->retina_options as $retina_descriptor => $multiplier ) {
 						$retina_image_size = ImageSize::get_retina_key( $option->key, $retina_descriptor );
-						$meta_data         = $this->resize_image(
-							$attachment->ID,
-							$meta_data,
-							$retina_image_size,
-							$option->size->w * $multiplier,
-							$option->size->h * $multiplier,
-							$option->size->crop
-						);
+						// generate retina only if original size is bigger in all dimensions than retina size.
+						$retina_w = $option->size->w * $multiplier;
+						$retina_h = $option->size->h * $multiplier;
+						if ( $retina_w < $meta_data['width'] && $retina_h < $meta_data['height'] ) {
+							$meta_data = $this->resize_image(
+								$attachment->ID,
+								$meta_data,
+								$retina_image_size,
+								$retina_w,
+								$retina_h,
+								$option->size->crop
+							);
+						}
 
 						if ( JRI_DUMMY_IMAGE && empty( $meta_data['sizes'][ $retina_image_size ]['valid'] ) ) {
 							$dummy_sizes[ $retina_image_size ] = $this->dummy_source( $option, $multiplier, $attachment->ID, $meta_data );
