@@ -483,7 +483,7 @@ class RwdImage {
 						// generate retina only if original size is bigger in all dimensions than retina size.
 						$retina_w = $option->size->w * $multiplier;
 						$retina_h = $option->size->h * $multiplier;
-						if ( $retina_w < $meta_data['width'] && $retina_h < $meta_data['height'] ) {
+						if ( $retina_w <= $meta_data['width'] && $retina_h <= $meta_data['height'] ) {
 							$meta_data = $this->resize_image(
 								$attachment->ID,
 								$meta_data,
@@ -619,7 +619,7 @@ class RwdImage {
 				// - if original image is bigger than resized copy - resize was successful.
 				if ( ( $meta_data['width'] > $resize_sizes['width'] && $meta_data['height'] > $resize_sizes['height'] )
 					// - if crop enabled and resized image match the requested size - resize was successful.
-					|| ( ! empty( $crop ) && $resize_sizes['width'] === $width && $resize_sizes['height'] === $height )
+					|| ( ! empty( $crop ) && $resize_sizes['width'] == $width && $resize_sizes['height'] == $height )
 				) {
 					// WP Image Editor save image.
 					$image_editor->save();
