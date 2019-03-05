@@ -90,7 +90,10 @@ There are no any special upgrade instructions for version 1.0 - 1.3
 To upgrade remove the old plugin folder. After than follow the installation steps 1-2.
 
 == Changelog ==
-= Version 1.6.4 - 25 January 2018 =
+
+= Version 1.6.5 - 5 March 2019 =
+    * Fixed retina size, which match image original size. 
+= Version 1.6.4 - 25 January 2019 =
     * Fixed always resize for retina if 2x is bigger than original image. 
     * Add ability to set default tag for rwd_attachment_image() with a filter.
 = Version 1.6.3 - 9 August 2018 =
