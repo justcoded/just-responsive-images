@@ -27,7 +27,7 @@ tags and generate required media queries for backgrounds.
 
 ## Register configuration hook
 
-To set configuration options you should create a new function and register a new filter hook `rwd_image_sizes`:
+To set configuration options you should create a new function and register a new filter hook `rwd_image_sizes` inside your `functions.php` file:
 
 	add_filter('rwd_image_sizes', 'my_rwd_image_sizes');
 	function my_rwd_image_sizes( $image_sizes ) {
@@ -43,14 +43,16 @@ In this case, load function will look like this:
 		return include get_stylesheet_directory() . '/rwd-image-sizes.php';
 	}
 
+After that you need to create a new file called `rwd-image-sizes.php` and set a configuration array there.
+
 ## Configuration array
 
 Here comes the most important part, you need to configure it very carefully. I will try to explain how to create 
 this array step-by-step.
 
-We will use the configuration as a separate file. 
-
 Configuration array is an associative multidimensional array.
+
+_*All examples is based on a second option of configuration settings - as a separate configuration file._
 
 #### Main image sizes
 
@@ -147,7 +149,7 @@ Let's start with an example:
     		),
     		'tablet' => array(
     			array( 980, 9999 ),
-    			'picture' => '<img srcset="{src}" alt="{alt}">',,
+    			'picture' => '<img src="{single-src}" srcset="{src}" alt="{alt}">',,
     			'bg' => '@media screen and (max-width:980px)',
     			'srcset' => '980w',
     			'sizes' => '(min-width: 415px) 980px',
@@ -266,7 +268,7 @@ It looks like this:
 			),
 			'mobile' => array(
 				array( 414, 9999 ),
-				'picture' => '<img src="{src}" srcset="{src}" alt="{alt}">', // mobile-first strategy picture img.
+				'picture' => '<img src="{single-src}" srcset="{src}" alt="{alt}">', // mobile-first strategy picture img.
 				'bg' => '',                                                 // mobile-first strategy bg.
 				'bg_retina' => '@media {dpr}, {min_res}',
 				'srcset' => '{w}w',
