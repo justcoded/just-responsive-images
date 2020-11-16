@@ -587,8 +587,15 @@ class RwdImage {
 	public function resize_image( $attach_id, $meta_data, $key, $width, $height, $crop ) {
 		$crop_str = ImageSize::crop_string( $crop );
 
-		$upload_dir    = wp_get_upload_dir();
-		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . image_get_intermediate_size( $attach_id, $key )['path'];
+		$upload_dir        = wp_get_upload_dir();
+		$intermediate_size = image_get_intermediate_size( $attach_id, $key );
+		$intermediate_path = '';
+
+		if ( ! empty( $intermediate_size ) ) {
+			$intermediate_path = $intermediate_size['path'];
+		}
+
+		$image_baseurl = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $intermediate_path;
 
 		$meta_data['sizes'][ $key ]['valid'] = true;
 
