@@ -38,7 +38,7 @@ class Controller
 	 * @param string $format    json|html   control which header content type should be sent
 	 * @param array $params     array of variables to be passed to the view file
 	 */
-	protected function _renderAjax( $template = null, $format, $params = array() )
+	protected function _renderAjax( $format, $template = null, $params = array() )
 	{
 		if ( $format == 'json' ) {
 			$responce = json_encode($params);
