@@ -91,8 +91,10 @@ To upgrade remove the old plugin folder. After than follow the installation step
 
 == Changelog ==
 
-= Version 1.6.6 - 6 September 2021 =
-    * PHP8 support
+= Version 1.6.7 - 6 September 2021 =
+    * PHP 8 support
+= Version 1.6.6 - 16 November 2020 =
+    * PHP 7.4 support
 = Version 1.6.5 - 5 March 2019 =
     * Fixed retina size, which match image original size. 
 = Version 1.6.4 - 25 January 2019 =
