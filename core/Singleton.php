@@ -51,7 +51,7 @@ class Singleton {
 	 *
 	 * @return void
 	 */
-	private function __clone() {
+	final public function __clone() {
 	}
 
 	/**
@@ -60,7 +60,7 @@ class Singleton {
 	 *
 	 * @return void
 	 */
-	private function __wakeup() {
+	final public function __wakeup() {
 	}
 
 }
